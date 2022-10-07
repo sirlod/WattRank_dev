@@ -12,6 +12,7 @@ from streamlit_option_menu import option_menu
 # import plotly as py
 import plotly.express as px
 import numpy as np
+import git
 
 
 config = {'displaylogo': False}
@@ -433,36 +434,35 @@ df = replace_nan(df)
 
 # Multipage menu
 with st.sidebar:
-    choose = option_menu('WattRank',
-                         [
-                          'About',
-                          'Energy plot',
-                          'Ragone plot',
-                          'Custom plot',
-                          'Add data',
-                          'Source data',
-                          'Contact'
-                         ],
-                         icons=['house',
-                                'battery-full',
-                                'hourglass-split',
-                                'graph-up',
-                                'upload',
-                                'stack',
-                                'person lines fill'],
-                         menu_icon='lightning-charge',
-                         default_index=0,
-                         styles={
-                                'container': {'padding': '6!important'},
-                                'icon': {'color': '#E5625E',
-                                         'font-size': '25px'},
-                                'nav-link': {'font-size': '16px',
-                                             'text-align': 'left',
-                                             'margin': '0px',
-                                             '--hover-color': '#E6E8E6'},
-                                'nav-link-selected': {'background-color': '#333399'},
-                                }
-                         )
+    choose = option_menu(
+        'WattRank',
+        ['About',
+         'Energy plot',
+         'Ragone plot',
+         'Custom plot',
+         'Add data',
+         'Source data',
+         'Contact'],
+        icons=['house',
+               'battery-full',
+               'hourglass-split',
+               'graph-up',
+               'upload',
+               'stack',
+               'person lines fill'],
+        menu_icon='lightning-charge',
+        default_index=0,
+        styles={
+               'container': {'padding': '6!important'},
+               'icon': {'color': '#E5625E',
+                        'font-size': '25px'},
+               'nav-link': {'font-size': '16px',
+                            'text-align': 'left',
+                            'margin': '0px',
+                            '--hover-color': '#E6E8E6'},
+               'nav-link-selected': {'background-color': '#333399'},
+               }
+                        )
 
 if choose == 'About':
     st.title('WattRank')
@@ -523,7 +523,7 @@ elif choose == 'Add data':
 
 elif choose == 'Source data':
     # st.write('Work in progress...')
-    st.table(df)
+    st.dataframe(df)
 
 elif choose == "Contact":
     # st.markdown(""" <style> .font {

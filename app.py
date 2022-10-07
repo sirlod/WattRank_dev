@@ -12,7 +12,7 @@ from streamlit_option_menu import option_menu
 # import plotly as py
 import plotly.express as px
 import numpy as np
-import git
+
 
 
 config = {'displaylogo': False}

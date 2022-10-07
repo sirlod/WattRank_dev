@@ -51,16 +51,14 @@ def page_config():
       )
 
 
-def session_state_init(name_list):
+def session_state_init(name):
     """Initialize sesion state counting for streamlit functions."""
-    for name in name_list:
-        if name not in st.session_state:
-            st.session_state[name] = 0
+    if name not in st.session_state:
+        st.session_state[name] = 0
 
 
-def reset_state(name_list):
-    for name in name_list:
-        st.session_state[name] += 1
+def reset_state(name):
+    st.session_state[name] += 1
 
 
 def layout():
@@ -367,9 +365,9 @@ def filters(df, x, y):
     filters_count = len(all_filters)
 
     # reseting filters using session state count
-    session_state_init(all_filters)
+
     if st.button("Reset to default"):
-        reset_state(all_filters)
+        reset_state('filters')
 
     # Layout filters into columns
     col_list = columns_layout(filters_count)
@@ -378,7 +376,7 @@ def filters(df, x, y):
     for option in filters_multiselect:
         with col_list[filters_multiselect.index(option)]:
             options_list = df[option].dropna().unique().tolist()
-            selected_option = st.multiselect(option, options_list, key=st.session_state[option])
+            selected_option = st.multiselect(option, options_list, key=option + str(st.session_state.filters))
             if len(selected_option) > 0:
                 new_df = new_df[(new_df[option].isin(selected_option))]
 
@@ -389,7 +387,7 @@ def filters(df, x, y):
         max_val = float(df[option].max())
         if min_val != max_val:
             with col_list[col_number]:
-                selected_range = st.slider(option, min_val, max_val, (min_val, max_val), 0.1, '%f', key=st.session_state[option])
+                selected_range = st.slider(option, min_val, max_val, (min_val, max_val), 0.1, '%f', key=option + str(st.session_state.filters))
                 # dealing with NaN values
                 display_NaN = True
                 if pd.isna(new_df[option]).any():
@@ -438,6 +436,7 @@ layout()
 
 df = read_csv('data.csv')
 df = replace_nan(df)
+session_state_init('filters')
 
 # Multipage menu
 with st.sidebar:

@@ -41,7 +41,7 @@ def page_config():
     """Setups page settings and menu options. Must be called as first streamlit command."""
     st.set_page_config(
           page_title="WattRank",
-          # page_icon="🧊",
+          page_icon="⚡",
           layout="wide",
           menu_items={
               # 'Get Help': 'https://www.extremelycoolapp.com/help',
@@ -51,10 +51,10 @@ def page_config():
       )
 
 
-def session_state_init(key):
+def session_state_init(name):
     """Initialize sesion state counting for streamlit functions."""
-    if key not in st.session_state:
-        st.session_state.filters = 0
+    if name not in st.session_state:
+        st.session_state[name] = 0
 
 
 def layout():
@@ -359,7 +359,7 @@ def filters(df, x, y):
     filters_slider = list(set(filters_slider)-set([x, y]))
     filters_count = len(filters_slider)+len(filters_multiselect)
 
-    # reseting filters using session state
+    # reseting filters using session state count
     if st.button("Reset to default"):
         st.session_state.filters += 1
 

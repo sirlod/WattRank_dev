@@ -18,7 +18,7 @@ import numpy as np
 config = {'displaylogo': False}
 HOVER_DATA_DICT = {
             'Specific Energy (Wh/kg)': False,
-            'Specific Power (Wh/kg)': True,
+            'Specific Power (W/kg)': True,
             'Energy density (Wh/L)': False,
             'Average OCV': True,
             'C rate (discharge)': True,
@@ -359,7 +359,7 @@ def filters(df, x, y):
     df = clean_axes_data(df, x, y)
     new_df = df.copy()
     filters_multiselect = ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor', 'Maturity', 'Additional tags']
-    filters_slider = ['Specific Energy (Wh/kg)', 'Energy density (Wh/L)', 'Specific Power (Wh/kg)', 'Average OCV', 'C rate (discharge)', 'C rate (charge)', 'Cycle life', 'Measurement temperature']
+    filters_slider = ['Specific Energy (Wh/kg)', 'Energy density (Wh/L)', 'Specific Power (W/kg)', 'Average OCV', 'C rate (discharge)', 'C rate (charge)', 'Cycle life', 'Measurement temperature']
     filters_slider = list(set(filters_slider)-set([x, y]))
     all_filters = filters_multiselect + filters_slider
     filters_count = len(all_filters)

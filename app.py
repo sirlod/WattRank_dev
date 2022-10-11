@@ -536,7 +536,7 @@ elif choose == "Contact":
     # font-size:35px ; font-family: 'Cooper Black'; color: #FF9633;}
     # </style> """, unsafe_allow_html=True)
     st.write('Work in progress...')
-    st.write('Please contact: marcin.w.orzech@gmail.com)
+    st.write('Please contact: marcin.w.orzech@gmail.com')
     # st.header('Contact Form')
     # with st.form(key='columns_in_form2',clear_on_submit=True): #set clear_on_submit=True so that the form will be reset/cleared once it's submitted
     #     #st.write('Please help us improve!')

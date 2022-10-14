@@ -477,7 +477,7 @@ with st.sidebar:
 
 if choose == 'About':
     ABOUT = read_file('readme.md')
-    st.title('WattRank')
+    st.title('⚡ WattRank')
     st.markdown(ABOUT)
 
 elif choose == 'Energy plot':

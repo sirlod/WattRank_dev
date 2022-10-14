@@ -14,7 +14,6 @@ import plotly.express as px
 import numpy as np
 
 
-
 config = {'displaylogo': False}
 HOVER_DATA_DICT = {
             'Specific Energy (Wh/kg)': False,
@@ -35,6 +34,12 @@ HOVER_DATA_DICT = {
             'Maturity': True,
             'Reference/source': True,
             }
+
+
+def read_file(name):
+    with open(name, 'r') as file:
+        text = file.read()
+    return text
 
 
 def page_config():
@@ -471,16 +476,9 @@ with st.sidebar:
                         )
 
 if choose == 'About':
+    ABOUT = read_file('readme.md')
     st.title('WattRank')
-    st.markdown('''
-           Researchers in the field of energy storage often use ‘Ragonne plot’ as a performance/application comparison tool between different technologies - mainly various chemistries of batteries and supercapacitors. The plot is basically power vs capacity (energy density to be exact) in log scale. It presents visually, where particular technology can be applied, as it provides information on how much energy and how fast device can deliver, two parameters that decide if one shall use eg. supercap for long duration stationary storage or regenerative breaking in cars. However, the data for the Ragonne plot researchers use is usually outdated, incomplete and scattered.
-
-    Same goes with other useful performance comparison plots found in research papers, such as gravimetric vs volumetric energy density, cycle life vs capacity etc.
-
-    I created this app with mission to create practical and easy to use tool for scientists/batteries enthusiast/entrepreneurs/investors etc., where they can find up-to-date data of all energy storage technologies (at every stage of development). I hope it will help standardize and improve quality of performance comparison plots used in research papers and analytical reports, as well as will be great database for future studies.
-
-    The most important thing about this project is to have community of people, who will be happy to add data to the database, especially of their of experimental results.
-            ''')
+    st.markdown(ABOUT)
 
 elif choose == 'Energy plot':
     groupby = groupby()

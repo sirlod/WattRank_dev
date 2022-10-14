@@ -1,4 +1,3 @@
-WattRank app - in development
 ---
 
 ## WattRank tool collects data on all types of energy storage technologies - batteries, supercapacitors, redox flow batteries etc., and creates plots that compare their performance. It features volumetric vs gravimetric energy plots as well as custom plots that can be used in papers.

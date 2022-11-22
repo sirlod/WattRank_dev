@@ -161,7 +161,7 @@ def scatter_plot(data, x, y, title, group, size):
     fig : object
         Plotly fig object.
     """
-    data = clean_axes_data(data, x, y)
+    # data = clean_axes_data(data, x, y)
     fig = px.scatter(data,
                      x=x,
                      y=y,
@@ -300,7 +300,7 @@ def highlight_clusters(fig, df, category, x, y):
 
     """
     category_list = df[category].unique().tolist()
-
+    df = clean_axes_data(df, x, y)
     for label in category_list:
         color = fig.data[category_list.index(label)].marker.color
         coords = confidence_ellipse(
@@ -355,13 +355,14 @@ def filters(df, x, y):
     ----------
     df : pd.DataFrame
     Input data.
+    x, y : axes columns
 
     Returns
     -------
     new_df : filtered dataframe
 
     """
-    df = clean_axes_data(df, x, y)
+    # df = clean_axes_data(df, x, y)
     new_df = df.copy()
     filters_multiselect = ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor', 'Maturity', 'Additional tags']
     filters_slider = ['Specific Energy (Wh/kg)', 'Energy density (Wh/L)', 'Specific Power (W/kg)', 'Average OCV', 'C rate (discharge)', 'C rate (charge)', 'Cycle life', 'Measurement temperature']
@@ -482,18 +483,23 @@ if choose == 'About':
 
 elif choose == 'Energy plot':
     groupby = groupby()
-    x = 'Energy density (Wh/L)'
-    y = 'Specific Energy (Wh/kg)'
-    title = 'Gravimetric vs Volumetric Energy'
+    x = 'Specific Energy (Wh/kg)'
+    y = 'Energy density (Wh/L)'
+    y2 = 'Specific Power (W/kg)'
 
     with st.expander('Filters'):
         df = filters(df, x, y)
-
-    fig_energy = scatter_plot(df, x, y, title, groupby, size_checkbox())
+    size = size_checkbox()
+    fig_energy = scatter_plot(df, x, y, f'{y} vs {x}', groupby, size)
     fig_energy = highlight_clusters(fig_energy, df, groupby, x, y)
-    plot = st.container()
 
-    plot.plotly_chart(fig_energy, use_container_width=True, config=config)
+    fig_power = scatter_plot(df, x, y2, f'{y2} vs {x}', groupby, size)
+    fig_power = highlight_clusters(fig_power, df, groupby, x, y2)
+
+    # plot = st.container()
+
+    st.plotly_chart(fig_energy, use_container_width=True, config=config)
+    st.plotly_chart(fig_power, use_container_width=True, config=config)
 
 elif choose == 'Ragone plot':
     st.write('Work in progress...')

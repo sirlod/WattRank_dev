@@ -48,11 +48,11 @@ def page_config():
           page_title="WattRank",
           page_icon="⚡",
           layout="wide",
-          menu_items={
-              # 'Get Help': 'https://www.extremelycoolapp.com/help',
-              # 'Report a bug': "https://www.extremelycoolapp.com/bug",
-              'About': "## WattRank is still under construction. v0.01"
-          }
+          # menu_items={
+          #     # 'Get Help': 'https://www.extremelycoolapp.com/help',
+          #     # 'Report a bug': "wattrank@gmail.com",
+          #     'About': "## WattRank is still under construction. v0.1"
+          # }
       )
 
 
@@ -77,8 +77,8 @@ def layout():
     """
     st.write('<style>div.row-widget.stRadio > div{flex-direction:row;} </style>', unsafe_allow_html=True)
     # st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{padding-left:2px;padding-bottom:1px;}</style>', unsafe_allow_html=True)
-    st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{padding-right:10px; padding-bottom:2px;} div.st-bx{margin-right:10px} div.st-bo{font-size:20px;font-weight:bold}</style>', unsafe_allow_html=True)
-    st.write('<style>label.css-qrbaxs.effi0qh3{font-size:16px;font-weight:bold}</style>', unsafe_allow_html=True)
+    # st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{padding-right:10px; padding-bottom:4px;} div.st-bx{margin-right:10px} div.st-bo{font-size:20px;font-weight:bold}</style>', unsafe_allow_html=True)
+    # st.write('<style>label.css-qrbaxs.effi0qh3{font-size:16px;font-weight:bold}</style>', unsafe_allow_html=True)
 
     # Hide footer and hamburger menu
     hide_streamlit_style = """
@@ -180,6 +180,7 @@ def scatter_plot(data, x, y, title, group, size):
                      mirror=True,
                      title_font_size=20,
                      showspikes=True,
+                      # rangeslider_visible=True,
                      )
     fig.update_yaxes(showline=True,
                      linewidth=2,
@@ -397,7 +398,7 @@ def filters(df, x, y):
                 # dealing with NaN values
                 display_NaN = True
                 if pd.isna(new_df[option]).any():
-                    display_NaN = st.checkbox(f'Some values in {option} are missing, include them?', True)
+                    display_NaN = st.checkbox(f'*Include missing values in **{option}**.*', True)
                 if not display_NaN:
                     new_df = new_df[(new_df[option].between(selected_range[0], selected_range[1]))]
                 else:
@@ -433,8 +434,13 @@ def groupby():
 
     """
     groups = ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor']
-    selected_group = st.radio('Group data by:', groups, 1)
+    selected_group = st.radio('**Group data by:**', groups, 1)
     return selected_group
+
+
+@st.cache
+def convert_df(df):
+    return df.to_csv().encode('utf-8')
 
 
 page_config()
@@ -449,7 +455,7 @@ with st.sidebar:
     choose = option_menu(
         'WattRank',
         ['About',
-         'Energy plot',
+         'Energy plots',
          'Ragone plot',
          'Custom plot',
          'Add data',
@@ -481,13 +487,13 @@ if choose == 'About':
     st.title('⚡ WattRank')
     st.markdown(ABOUT)
 
-elif choose == 'Energy plot':
+elif choose == 'Energy plots':
     groupby = groupby()
     x = 'Specific Energy (Wh/kg)'
     y = 'Energy density (Wh/L)'
     y2 = 'Specific Power (W/kg)'
 
-    with st.expander('Filters'):
+    with st.expander('**Filters**'):
         df = filters(df, x, y)
     size = size_checkbox()
     fig_energy = scatter_plot(df, x, y, f'{y} vs {x}', groupby, size)
@@ -498,8 +504,8 @@ elif choose == 'Energy plot':
 
     # plot = st.container()
 
-    st.plotly_chart(fig_energy, use_container_width=True, config=config)
-    st.plotly_chart(fig_power, use_container_width=True, config=config)
+    st.plotly_chart(fig_energy, use_container_width=True, theme=None, config=config)
+    st.plotly_chart(fig_power, use_container_width=True, theme=None, config=config)
 
 elif choose == 'Ragone plot':
     st.write('Work in progress...')
@@ -518,15 +524,15 @@ elif choose == 'Custom plot':
         st.error('The value for X and Y axes cannot be the same')
     else:
         groupby = groupby()
-        with st.expander('Filters'):
+        with st.expander('**Filters**'):
             df = filters(df, x, y)
         fig_custom = scatter_plot(df, x, y, f'{y} vs {x}', groupby, size_checkbox())
         if st.checkbox('Hihlight clusters'):
             fig_custom = highlight_clusters(fig_custom, df, groupby, x, y)
-
+        fig_custom.update_xaxes(rangemode="nonnegative")
         plot = st.container()
 
-        plot.plotly_chart(fig_custom, use_container_width=True, config=config)
+        plot.plotly_chart(fig_custom, use_container_width=True, theme=None, config=config)
 
 elif choose == 'Add data':
     st.write('Work in progress...')
@@ -534,6 +540,12 @@ elif choose == 'Add data':
 elif choose == 'Source data':
     # st.write('Work in progress...')
     st.dataframe(df)
+    st.download_button(
+        label="Download data as CSV",
+        data=convert_df(df),
+        file_name='WattRank.csv',
+        mime='text/csv',
+    )
 
 elif choose == "Contact":
     # st.markdown(""" <style> .font {

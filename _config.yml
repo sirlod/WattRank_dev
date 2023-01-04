@@ -1,0 +1,8 @@
+theme: jekyll-theme-cayman
+title: WattRank
+description: WattRank tool collects data on all types of energy storage technologies - batteries, supercapacitors, redox flow batteries etc., and creates plots that compare their performance.
+url: https://wattrank.com
+author: Marcin Orzech
+plugins:
+  - jekyll-seo-tag
+google_analytics: UA-252941783-1

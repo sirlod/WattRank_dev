@@ -15,6 +15,32 @@ import numpy as np
 
 
 config = {'displaylogo': False}
+PARAMETERS_DESCRIPTION = {
+    'Name': 'Unique name of the device',
+    'Specific Energy (Wh/kg)': 'Energy delivered at C rate (discharge) divided by the mass (see Capacity calculation method).',
+    'Specific Power (W/kg)': 'Power (continuous) delivered at C rate (charge) divided by the mass (see Capacity calculation method).',
+    'Specific Power - Peak (W/kg)': 'Maximum Power that can be delivered for 5 minutes, divided by the mass (see Capacity calculation method).',
+    'Energy density (Wh/L)': 'Energy delivered at C rate (discharge) divided by the volume (see Capacity calculation method).',
+    'Average OCV': 'Usually the nominal voltage of the device.',
+    'C rate (discharge)': 'Discharge current rate',
+    'C rate (charge)': 'Charge current rate',
+    'Specific capacity (Ah/kg)': 'Capacity delivered at C rate (discharge) divided by the mass (see Capacity calculation method).',
+    'Volumetric capacity (Ah/L)': 'Capacity delivered at C rate (discharge) divided by the volume (see Capacity calculation method).',
+    'Capacity (Ah)': 'Capacity of the device',
+    'Capacity calculation method': "Indicates method used for specific/volumetric values calculation. 'Pack' - mass/volume of whole pack is considered; 'Cell' - mass/volume of the cell is considered; 'Active material' - only mass/volume of anode and cathode active materials is considered (usually used in research stage, less practical).",
+    'Technology': 'Energy storage technology (Battery, Supercapacitor, Flow Battery etc.)',
+    'Category': 'Section of energy storage technology (i.e. Li-ion, Na-ion, Vanadium RFB etc.)',
+    'Cathode': 'Chemical composition of the cathode',
+    'Anode': 'Chemical composition of the anode',
+    'Electrolyte': 'Chemical composition of the electrolyte',
+    'Form factor': 'Form factor of the battery',
+    'Cycle life': "Number of equivalent full cycles until capacity drops to 80% of initial value. Missing value are replaced with '1'.",
+    'Measurement temperature': 'Environment temperature during the measuremnts ',
+    'Additional tags': 'Extra information on the device - for example indicating specific category (like solid-state electrolyte), test type, application of device or specific test conditions that influence results significantly (for example preactivation of electrode to improve performance) ',
+    'Publication date': 'Date of data publication',
+    'Maturity': "Maturity of the device. 'Commercial' - device is available on the market (fully developed); 'Development' - device is in development stage with prototypes made in practical form factors (TRL 5-8); 'Research' - devices in research stage, usually in lab-scale form factors (TRL 1-4)",
+    'Reference/source': 'Link or DOI referencing to data source'
+}
 HOVER_DATA_DICT = {
             'Specific Energy (Wh/kg)': False,
             'Specific Power (W/kg)': True,
@@ -48,11 +74,11 @@ def page_config():
           page_title="WattRank",
           page_icon="⚡",
           layout="wide",
-          # menu_items={
-          #     # 'Get Help': 'https://www.extremelycoolapp.com/help',
-          #     # 'Report a bug': "wattrank@gmail.com",
-          #     'About': "## WattRank is still under construction. v0.1"
-          # }
+          menu_items={
+               'Get Help': None,
+               'Report a bug': "mailto:wattrank@gmail.com",
+               'About': "## WattRank is still under construction. v0.0.1"
+           }
       )
 
 
@@ -75,7 +101,7 @@ def layout():
     None.
 
     """
-    st.write('<style>div.row-widget.stRadio > div{flex-direction:row;} </style>', unsafe_allow_html=True)
+    # st.write('<style>div.row-widget.stRadio > div{flex-direction:row;} </style>', unsafe_allow_html=True) # makes st.radio horizontal - now depriciated by horizontal parameter
     # st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{padding-left:2px;padding-bottom:1px;}</style>', unsafe_allow_html=True)
     # st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{padding-right:10px; padding-bottom:4px;} div.st-bx{margin-right:10px} div.st-bo{font-size:20px;font-weight:bold}</style>', unsafe_allow_html=True)
     # st.write('<style>label.css-qrbaxs.effi0qh3{font-size:16px;font-weight:bold}</style>', unsafe_allow_html=True)
@@ -83,7 +109,7 @@ def layout():
     # Hide footer and hamburger menu
     hide_streamlit_style = """
                 <style>
-                MainMenu {visibility: hidden;}
+                #MainMenu {visibility: hidden;}
                 footer {visibility: hidden;}
                 </style>
                 """
@@ -383,7 +409,7 @@ def filters(df, x, y):
     for option in filters_multiselect:
         with col_list[filters_multiselect.index(option)]:
             options_list = df[option].dropna().unique().tolist()
-            selected_option = st.multiselect(option, options_list, key=option + str(st.session_state.filters))
+            selected_option = st.multiselect(option, options_list, key=option + str(st.session_state.filters), help = PARAMETERS_DESCRIPTION.get(option, ''))
             if len(selected_option) > 0:
                 new_df = new_df[(new_df[option].isin(selected_option))]
 
@@ -394,7 +420,7 @@ def filters(df, x, y):
         max_val = float(df[option].max())
         if min_val != max_val:
             with col_list[col_number]:
-                selected_range = st.slider(option, min_val, max_val, (min_val, max_val), 0.1, '%f', key=option + str(st.session_state.filters))
+                selected_range = st.slider(option, min_val, max_val, (min_val, max_val), 0.1, '%f', key=option + str(st.session_state.filters), help = PARAMETERS_DESCRIPTION.get(option, ''))
                 # dealing with NaN values
                 display_NaN = True
                 if pd.isna(new_df[option]).any():
@@ -434,7 +460,8 @@ def groupby():
 
     """
     groups = ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor']
-    selected_group = st.radio('**Group data by:**', groups, 1)
+    st.markdown('### Group data by:')
+    selected_group = st.radio('**Group data by:**', groups, 1, horizontal=True, label_visibility='collapsed')
     return selected_group
 
 
@@ -442,7 +469,7 @@ def groupby():
 def convert_df(df):
     return df.to_csv().encode('utf-8')
 
-
+params = pd.DataFrame.from_dict(PARAMETERS_DESCRIPTION, orient='index', columns=['Description'])
 page_config()
 layout()
 
@@ -538,20 +565,26 @@ elif choose == 'Add data':
     st.write('Work in progress...')
 
 elif choose == 'Source data':
-    # st.write('Work in progress...')
+    st.title('WattRank data:')
     st.dataframe(df)
     st.download_button(
-        label="Download data as CSV",
+        label="***Download data as .csv***",
         data=convert_df(df),
         file_name='WattRank.csv',
         mime='text/csv',
     )
+    '---'
+    st.markdown('## Parameters description:')
+
+    params = pd.Series(PARAMETERS_DESCRIPTION, name='Description')
+    # // below option with no header
+    # params = pd.DataFrame.from_dict(PARAMETERS_DESCRIPTION, orient='index')
+    # params = params.style.hide_columns()
+    # st.write(params.to_html(), unsafe_allow_html=True)
+    st.write(params)
 
 elif choose == "Contact":
-    # st.markdown(""" <style> .font {
-    # font-size:35px ; font-family: 'Cooper Black'; color: #FF9633;}
-    # </style> """, unsafe_allow_html=True)
-    st.write('Work in progress...')
+    PARAMETERS_DESCRIPTION = ''
     st.write('Please contact: marcin.w.orzech@gmail.com')
     # st.header('Contact Form')
     # with st.form(key='columns_in_form2',clear_on_submit=True): #set clear_on_submit=True so that the form will be reset/cleared once it's submitted

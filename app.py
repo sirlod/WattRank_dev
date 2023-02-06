@@ -9,41 +9,16 @@ Created on Sun May  1 13:21:11 2022.
 import pandas as pd
 import streamlit as st
 from streamlit_option_menu import option_menu
-# import plotly as py
 import plotly.express as px
 import numpy as np
+import database
 
 
 config = {'displaylogo': False}
-PARAMETERS_DESCRIPTION = {
-    'Name': 'Unique name of the device',
-    'Specific Energy (Wh/kg)': 'Energy delivered at C rate (discharge) divided by the mass (see Capacity calculation method).',
-    'Specific Power (W/kg)': 'Power (continuous) delivered at C rate (charge) divided by the mass (see Capacity calculation method).',
-    'Specific Power - Peak (W/kg)': 'Maximum Power that can be delivered for 5 minutes, divided by the mass (see Capacity calculation method).',
-    'Energy density (Wh/L)': 'Energy delivered at C rate (discharge) divided by the volume (see Capacity calculation method).',
-    'Average OCV': 'Usually the nominal voltage of the device.',
-    'C rate (discharge)': 'Discharge current rate',
-    'C rate (charge)': 'Charge current rate',
-    'Specific capacity (Ah/kg)': 'Capacity delivered at C rate (discharge) divided by the mass (see Capacity calculation method).',
-    'Volumetric capacity (Ah/L)': 'Capacity delivered at C rate (discharge) divided by the volume (see Capacity calculation method).',
-    'Capacity (Ah)': 'Capacity of the device',
-    'Capacity calculation method': "Indicates method used for specific/volumetric values calculation. 'Pack' - mass/volume of whole pack is considered; 'Cell' - mass/volume of the cell is considered; 'Active material' - only mass/volume of anode and cathode active materials is considered (usually used in research stage, less practical).",
-    'Technology': 'Energy storage technology (Battery, Supercapacitor, Flow Battery etc.)',
-    'Category': 'Section of energy storage technology (i.e. Li-ion, Na-ion, Vanadium RFB etc.)',
-    'Cathode': 'Chemical composition of the cathode',
-    'Anode': 'Chemical composition of the anode',
-    'Electrolyte': 'Chemical composition of the electrolyte',
-    'Form factor': 'Form factor of the battery',
-    'Cycle life': "Number of equivalent full cycles until capacity drops to 80% of initial value. Missing value are replaced with '1'.",
-    'Measurement temperature': 'Environment temperature during the measuremnts ',
-    'Additional tags': 'Extra information on the device - for example indicating specific category (like solid-state electrolyte), test type, application of device or specific test conditions that influence results significantly (for example preactivation of electrode to improve performance) ',
-    'Publication date': 'Date of data publication',
-    'Maturity': "Maturity of the device. 'Commercial' - device is available on the market (fully developed); 'Development' - device is in development stage with prototypes made in practical form factors (TRL 5-8); 'Research' - devices in research stage, usually in lab-scale form factors (TRL 1-4)",
-    'Reference/source': 'Link or DOI referencing to data source'
-}
 HOVER_DATA_DICT = {
             'Specific Energy (Wh/kg)': False,
             'Specific Power (W/kg)': True,
+            'Specific Power - Peak (W/kg)':True,
             'Energy density (Wh/L)': False,
             'Average OCV': True,
             'C rate (discharge)': True,
@@ -59,7 +34,7 @@ HOVER_DATA_DICT = {
             'Publication date': True,
             'Maturity': True,
             'Reference/source': True,
-            }
+            } 
 
 
 def read_file(name):
@@ -77,7 +52,7 @@ def page_config():
           menu_items={
                'Get Help': None,
                'Report a bug': "mailto:wattrank@gmail.com",
-               'About': "## WattRank is still under construction. v0.0.1"
+               'About': "## WattRank is still under construction. v0.0.2"
            }
       )
 
@@ -116,6 +91,11 @@ def layout():
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
+# @st.cache(allow_output_mutation=True)
+def read_sql(table_name):
+    return database.get_table(table_name)
+
+
 @st.cache(allow_output_mutation=True)
 def read_csv(path):
     """
@@ -134,9 +114,15 @@ def read_csv(path):
     return pd.read_csv(path)
 
 
+def rename_columns(df, df_params):
+    name_map = dict(zip(df_params['short_name'], df_params['long_name']))
+    df.rename(columns=name_map, inplace=True)
+
+
 def replace_nan(dataframe):
     """Replace NaN values with 'None' in non numerical columns."""
-    df.select_dtypes('object').fillna('None', inplace=True)
+    object_cols = df.select_dtypes(['object']).fillna('_No data_')
+    df[object_cols.columns] = object_cols
     return df
 
 
@@ -236,7 +222,7 @@ def scatter_plot(data, x, y, title, group, size):
 
 
 def connect_legend_with_clusters(fig):
-    """Click legend to toggle cluster highlighting together with markers."""
+    """Click legend to toggle cluster highlight together with markers."""
     group_list = df[groupby].unique().tolist()
     for label in group_list:
         fig.update_traces(selector=label,
@@ -392,7 +378,7 @@ def filters(df, x, y):
     # df = clean_axes_data(df, x, y)
     new_df = df.copy()
     filters_multiselect = ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor', 'Maturity', 'Additional tags']
-    filters_slider = ['Specific Energy (Wh/kg)', 'Energy density (Wh/L)', 'Specific Power (W/kg)', 'Average OCV', 'C rate (discharge)', 'C rate (charge)', 'Cycle life', 'Measurement temperature']
+    filters_slider = ['Specific Energy (Wh/kg)', 'Energy density (Wh/L)', 'Specific Power (W/kg)', 'Specific Power - Peak (W/kg)', 'Average OCV', 'C rate (discharge)', 'C rate (charge)', 'Cycle life', 'Measurement temperature']
     filters_slider = list(set(filters_slider)-set([x, y]))
     all_filters = filters_multiselect + filters_slider
     filters_count = len(all_filters)
@@ -408,8 +394,9 @@ def filters(df, x, y):
     # drawing multiselect filters
     for option in filters_multiselect:
         with col_list[filters_multiselect.index(option)]:
-            options_list = df[option].dropna().unique().tolist()
-            selected_option = st.multiselect(option, options_list, key=option + str(st.session_state.filters), help = PARAMETERS_DESCRIPTION.get(option, ''))
+            st.write('---')
+            options_list = set(df[option].str.split(',').sum())
+            selected_option = st.multiselect(option, options_list, key=option + str(st.session_state.filters), help = df_params.loc[df_params['long_name'] == option, 'description'].values[0])
             if len(selected_option) > 0:
                 new_df = new_df[(new_df[option].isin(selected_option))]
 
@@ -420,7 +407,8 @@ def filters(df, x, y):
         max_val = float(df[option].max())
         if min_val != max_val:
             with col_list[col_number]:
-                selected_range = st.slider(option, min_val, max_val, (min_val, max_val), 0.1, '%f', key=option + str(st.session_state.filters), help = PARAMETERS_DESCRIPTION.get(option, ''))
+                st.write('---')
+                selected_range = st.slider(option, min_val, max_val, (min_val, max_val), 0.1, '%f', key=option + str(st.session_state.filters), help = df_params.loc[df_params['long_name'] == option, 'description'].values[0])
                 # dealing with NaN values
                 display_NaN = True
                 if pd.isna(new_df[option]).any():
@@ -465,23 +453,194 @@ def groupby():
     return selected_group
 
 
-@st.cache
+def input_field(parameter):
+    # highlight labels of required fields
+    required_fields = ['Name', 'Specific Energy (Wh/kg)',
+                       'Specific Power (W/kg)', 'Energy density (Wh/L)',
+                       'Technology', 'Category', 'Capacity calculation method',
+                       'Form factor', 'Maturity', 'Reference/source']
+    label = parameter
+    if parameter in required_fields:
+        label = parameter+':red[*]'
+
+    help_prompt = df_params.loc[df_params['long_name'] == parameter, 'description'].values[0]
+    # columns with new, unique text values
+    if parameter in ['Name', 'Reference/source']:
+        value = st.text_input(
+            label,
+            key='form' + parameter + str(st.session_state.form),
+            help=help_prompt,
+            placeholder=f'Type in {parameter} (required)')
+    # columns with predetermined values to select from. no new values allowed
+    elif parameter in ['Capacity calculation method', 'Maturity']:
+        options_list = set(df[parameter].str.split(',').sum())
+        value = st.multiselect(
+            label,
+            options_list,
+            key='form' + parameter + str(st.session_state.form),
+            help=help_prompt,
+            max_selections=1)
+        value = ''.join(value)
+    # columns with options to select from, but with possibility to add new values
+    elif parameter in ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor']:
+        options_list = set(df[parameter].str.split(',').sum())
+        field = st.empty()
+        new_value = st.checkbox('Value not in the list. Add new value', key=parameter + str(st.session_state.form))
+        value = field.multiselect(
+            label,
+            options_list,
+            key='form' + parameter + str(st.session_state.form),
+            help=help_prompt,
+            max_selections=1,
+            disabled=new_value)
+        value = ''.join(value)
+        if new_value:
+            value = field.text_input(
+                label,
+                help=help_prompt,
+                placeholder='Type in new value')
+    # column with both selectable values and new values
+    elif parameter == 'Additional tags':
+        options_list = set(df[parameter].str.split(',').sum())
+        options_list.remove('_No data_')
+        value = st.multiselect(
+            label,
+            options_list,
+            key='form' + parameter + str(st.session_state.form),
+            help=help_prompt)
+        if st.checkbox('Add more tags', key=parameter + str(st.session_state.form)):
+            new_value = st.text_input(
+                label,
+                help='Make sure to separate tags with commas (,)',
+                placeholder='Separate tags with commas')
+            value = value + new_value.split(',')
+        value = ','.join(value)
+    # columns with integer data
+    elif parameter in ['Cycle life', 'Publication date']:
+        value = st.number_input(
+            label,
+            min_value=0,
+            key='form' + parameter + str(st.session_state.form),
+            help=help_prompt)
+        if value == 0:
+            value = None
+    # columns with float data
+    else:
+        value = st.number_input(
+            label,
+            min_value=0.0,
+            step=0.1,
+            format='%.1f',
+            key='form' + parameter + str(st.session_state.form),
+            help=help_prompt)
+        if value == 0:
+            value = None
+    return value
+
+
+def input_form():
+    inputs = {}
+    # Layout into columns
+    col_list = columns_layout(len(df.columns))
+    # with st.form(key='Upload data',clear_on_submit=True):
+    # drawing text input fields
+    for parameter in df.columns:
+        with col_list[df.columns.get_loc(parameter)]:
+            st.write('---')
+            value = input_field(parameter)
+            inputs[parameter] = value
+        # submitted = st.form_submit_button('Submit')
+    return inputs
+
+
+def values_missing(inputs):
+    missing = False
+    required_fields = ['Name', 'Specific Energy (Wh/kg)',
+                       'Specific Power (W/kg)', 'Energy density (Wh/L)',
+                       'Technology', 'Category', 'Capacity calculation method',
+                       'Form factor', 'Maturity', 'Reference/source']
+    for v in required_fields:
+        if not inputs[v]:
+            missing = True
+    return missing
+
+
+def check_duplicates(data):
+    columns = ['Specific Energy (Wh/kg)', 'Specific Power (W/kg)',
+               'Energy density (Wh/L)', 'Reference/source']
+    duplicates = data.duplicated(subset=columns, keep='last')
+    duplicated = data[duplicates].index.tolist()
+    if duplicates.any():
+        st.error(f"It seems that we already have this data point. Please check data row {duplicated} in 'Source data' tab.")
+        return True
+    else:
+        return False
+
+
+def send_data_to_database(data: dict):
+    cols = df_params['short_name'].tolist()
+    cols = ','.join(cols)
+    values = list(data.values())
+    database.upload_row(cols, values)
+
+
+def email_prompt():
+    c1, c2 = st.columns(2)
+    c2.write("**Please add your email, so it will possible to contact you regarding the uploaded data. It won't' be shared with anyone beside the author of this website.**")
+    with c1:
+        address = st.text_input('***Email address:***:red[*]',
+                                key=str(st.session_state.form),
+                                placeholder='example@gmail.com')
+    return address
+
+
+def upload_button(inputs, address):
+    uploaded = False
+    if st.button('Upload data', type='primary'):
+        # check if all required fields are filled
+        if values_missing(inputs) or not address:
+            return st.error('Please fill in all required fields')
+        # check for duplicates
+        if check_duplicates(df_updated):
+            return st.error('Upload failed.')
+        # check if email correct
+        if '@' not in address:
+            return st.error('Please fill in correct email address')
+        # upload to sql
+        else:
+            try:
+                send_data_to_database(inputs)
+                database.save_email(address)
+            except:
+                st.error('Something went wrong with the upload')
+            else:
+                uploaded = True
+                reset_state('form')
+    if uploaded:
+        return st.success('Thank you for sharing!')
+
+
+# @st.cache
 def convert_df(df):
     return df.to_csv().encode('utf-8')
 
-params = pd.DataFrame.from_dict(PARAMETERS_DESCRIPTION, orient='index', columns=['Description'])
+
 page_config()
 layout()
 
-df = read_csv('data.csv')
+# df = read_csv('data.csv')
+df = read_sql('data')
+df_params = read_sql('parameters')
+rename_columns(df, df_params)
 df = replace_nan(df)
 session_state_init('filters')
+session_state_init('form')
 
 # Multipage menu
 with st.sidebar:
     choose = option_menu(
         'WattRank',
-        ['About',
+        ['Home',
          'Energy plots',
          'Ragone plot',
          'Custom plot',
@@ -509,7 +668,7 @@ with st.sidebar:
                }
                         )
 
-if choose == 'About':
+if choose == 'Home':
     ABOUT = read_file('readme.md')
     st.title('⚡ WattRank')
     st.markdown(ABOUT)
@@ -519,6 +678,7 @@ elif choose == 'Energy plots':
     x = 'Specific Energy (Wh/kg)'
     y = 'Energy density (Wh/L)'
     y2 = 'Specific Power (W/kg)'
+    df = df.sort_values(by=groupby)
 
     with st.expander('**Filters**'):
         df = filters(df, x, y)
@@ -551,6 +711,7 @@ elif choose == 'Custom plot':
         st.error('The value for X and Y axes cannot be the same')
     else:
         groupby = groupby()
+        df = df.sort_values(by=groupby)
         with st.expander('**Filters**'):
             df = filters(df, x, y)
         fig_custom = scatter_plot(df, x, y, f'{y} vs {x}', groupby, size_checkbox())
@@ -562,7 +723,21 @@ elif choose == 'Custom plot':
         plot.plotly_chart(fig_custom, use_container_width=True, theme=None, config=config)
 
 elif choose == 'Add data':
-    st.write('Work in progress...')
+    st.write('## Upload your own data:')
+    new_data = input_form()
+    df_updated = pd.concat([df, pd.DataFrame(new_data, index=[len(df)])], ignore_index=True)
+    "---"
+    if st.button("Clear all"):
+        reset_state('form')
+
+    st.write('### Your new data:')
+    st.dataframe(
+        df_updated.tail(3).style.apply
+        (lambda x: ['background-color: #333399' if i == df_updated.index[-1] else '' for i in x.index], axis=0))
+
+    st.info('***If everything looks ok and you are sure it is correct, click below to upload the data to server.***')
+    address = email_prompt()
+    upload_button(new_data, address)
 
 elif choose == 'Source data':
     st.title('WattRank data:')
@@ -575,23 +750,8 @@ elif choose == 'Source data':
     )
     '---'
     st.markdown('## Parameters description:')
-
-    params = pd.Series(PARAMETERS_DESCRIPTION, name='Description')
-    # // below option with no header
-    # params = pd.DataFrame.from_dict(PARAMETERS_DESCRIPTION, orient='index')
-    # params = params.style.hide_columns()
-    # st.write(params.to_html(), unsafe_allow_html=True)
-    st.write(params)
+    st.write(df_params[['long_name', 'description']].set_index('long_name'))
 
 elif choose == "Contact":
     PARAMETERS_DESCRIPTION = ''
-    st.write('Please contact: marcin.w.orzech@gmail.com')
-    # st.header('Contact Form')
-    # with st.form(key='columns_in_form2',clear_on_submit=True): #set clear_on_submit=True so that the form will be reset/cleared once it's submitted
-    #     #st.write('Please help us improve!')
-    #     Name=st.text_input(label='Please Enter Your Name') #Collect user feedback
-    #     Email=st.text_input(label='Please Enter Email') #Collect user feedback
-    #     Message=st.text_input(label='Please Enter Your Message') #Collect user feedback
-    #     submitted = st.form_submit_button('Submit')
-    #     if submitted:
-    #         st.success('Thanks for your feedback!')
+    st.write('Author of this website: marcin.w.orzech@gmail.com')

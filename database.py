@@ -7,12 +7,8 @@ Created on Sun May  1 13:21:11 2022.
 
 import os
 import psycopg2
-from dotenv import load_dotenv
 import pandas as pd
 
-
-load_dotenv()
-# connection = psycopg2.connect(os.environ["DATABASE_URL"])
 
 DATA_TABLE = "SELECT * FROM data ORDER BY id;"
 PARAMETERS_TABLE = "SELECT * FROM parameters;"

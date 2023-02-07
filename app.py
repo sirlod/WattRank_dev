@@ -91,13 +91,13 @@ def layout():
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
-# @st.cache(allow_output_mutation=True)
+@st.experimental_memo
 def read_sql(table_name):
     return database.get_table(table_name)
 
 
 @st.cache(allow_output_mutation=True)
-def read_csv(path):
+def read_csv(path): #depraciated
     """
     Read the data and assign to df.
 
@@ -617,6 +617,8 @@ def upload_button(inputs, address):
                 uploaded = True
                 reset_state('form')
     if uploaded:
+        # clear data from cache, so the updated table will be loaded
+        st.experimental_memo.clear()
         return st.success('Thank you for sharing!')
 
 

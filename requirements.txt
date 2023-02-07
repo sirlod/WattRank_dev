@@ -3,4 +3,4 @@ streamlit
 streamlit_option_menu
 plotly
 numpy
-psycopg2
+psycopg2-binary

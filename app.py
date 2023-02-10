@@ -381,18 +381,18 @@ def filters(df, x, y, preset):
     filters_slider = list(set(filters_slider)-set([x, y]))
     all_filters = filters_multiselect + filters_slider
     filters_count = len(all_filters)
+    st.markdown('## *Filters:*')
 
     # reseting filters using session state count
-
     if st.button("Reset to default"):
         reset_state('filters')
 
     # Layout filters into columns
-    col_list = columns_layout(filters_count)
+    # col_list = columns_layout(filters_count)
 
     # drawing multiselect filters
     for option in filters_multiselect:
-        with col_list[filters_multiselect.index(option)]:
+        # with col_list[filters_multiselect.index(option)]:
             st.write('---')
             options_list = set(df[option].str.split(',').sum())
             selected_option = st.multiselect(option, options_list, default=preset.get(option), key=option + str(st.session_state.filters), help = df_params.loc[df_params['long_name'] == option, 'description'].values[0])
@@ -400,7 +400,7 @@ def filters(df, x, y, preset):
                 new_df = new_df[(new_df[option].isin(selected_option))]
 
     # drawing slider filters
-    col_number = len(filters_multiselect)
+    # col_number = len(filters_multiselect)
     for option in filters_slider:
         min_val = float(df[option].min())
         max_val = float(df[option].max())
@@ -408,7 +408,7 @@ def filters(df, x, y, preset):
         if preset.get(option):
             set_range = (preset.get(option))
         if min_val != max_val:
-            with col_list[col_number]:
+            # with col_list[col_number]:
                 st.write('---')
                 selected_range = st.slider(
                     option,
@@ -428,7 +428,7 @@ def filters(df, x, y, preset):
                     new_df = new_df[(new_df[option].between(selected_range[0], selected_range[1]))]
                 else:
                     new_df = new_df[(new_df[option].between(selected_range[0], selected_range[1]) | (pd.isna(new_df[option])))]
-            col_number += 1
+            # col_number += 1
 
     return new_df
 
@@ -708,8 +708,11 @@ elif choose == 'Energy plots':
     y2 = 'Specific Power (W/kg)'
     df = df.sort_values(by=groupby)
     preset = filters_preset()
-    with st.expander('**Filters**'):
+
+    with st.sidebar:
         df = filters(df, x, y, preset)
+    # with st.expander('**Filters**'):
+    #     df = filters(df, x, y, preset)
     size = size_checkbox()
     fig_energy = scatter_plot(df, x, y, f'{y} vs {x}', groupby, size)
     fig_energy = highlight_clusters(fig_energy, df, groupby, x, y)
@@ -718,7 +721,7 @@ elif choose == 'Energy plots':
     fig_power = highlight_clusters(fig_power, df, groupby, x, y2)
 
     # plot = st.container()
-
+    # with main:
     st.plotly_chart(fig_energy, use_container_width=True, theme=None, config=config)
     st.plotly_chart(fig_power, use_container_width=True, theme=None, config=config)
 
@@ -741,8 +744,10 @@ elif choose == 'Custom plot':
         groupby = groupby()
         df = df.sort_values(by=groupby)
         preset = filters_preset()
-        with st.expander('**Filters**'):
+        with st.sidebar:
             df = filters(df, x, y, preset)
+        # with st.expander('**Filters**'):
+        #     df = filters(df, x, y, preset)
         fig_custom = scatter_plot(df, x, y, f'{y} vs {x}', groupby, size_checkbox())
         if st.checkbox('Hihlight clusters'):
             fig_custom = highlight_clusters(fig_custom, df, groupby, x, y)

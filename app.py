@@ -96,7 +96,6 @@ def read_sql(table_name):
     return database.get_table(table_name)
 
 
-@st.cache(allow_output_mutation=True)
 def read_csv(path): #depraciated
     """
     Read the data and assign to df.
@@ -360,7 +359,7 @@ def columns_layout(widgets_count):
     return col_list
 
 
-def filters(df, x, y):
+def filters(df, x, y, preset):
     """
     Filter the input data.
 
@@ -396,7 +395,7 @@ def filters(df, x, y):
         with col_list[filters_multiselect.index(option)]:
             st.write('---')
             options_list = set(df[option].str.split(',').sum())
-            selected_option = st.multiselect(option, options_list, key=option + str(st.session_state.filters), help = df_params.loc[df_params['long_name'] == option, 'description'].values[0])
+            selected_option = st.multiselect(option, options_list, default=preset.get(option), key=option + str(st.session_state.filters), help = df_params.loc[df_params['long_name'] == option, 'description'].values[0])
             if len(selected_option) > 0:
                 new_df = new_df[(new_df[option].isin(selected_option))]
 
@@ -405,10 +404,22 @@ def filters(df, x, y):
     for option in filters_slider:
         min_val = float(df[option].min())
         max_val = float(df[option].max())
+        set_range = min_val, max_val
+        if preset.get(option):
+            set_range = (preset.get(option))
         if min_val != max_val:
             with col_list[col_number]:
                 st.write('---')
-                selected_range = st.slider(option, min_val, max_val, (min_val, max_val), 0.1, '%f', key=option + str(st.session_state.filters), help = df_params.loc[df_params['long_name'] == option, 'description'].values[0])
+                selected_range = st.slider(
+                    option,
+                    min_val,
+                    max_val,
+                    value=set_range,
+                    step=0.1,
+                    format='%f',
+                    key=option + str(st.session_state.filters),
+                    help=df_params.loc[df_params['long_name'] == option, 'description'].values[0]
+                    )
                 # dealing with NaN values
                 display_NaN = True
                 if pd.isna(new_df[option]).any():
@@ -421,6 +432,21 @@ def filters(df, x, y):
 
     return new_df
 
+
+def filters_preset():
+    preset_filters = {}
+    form_factors = df['Form factor'].unique().tolist()
+    preset_options = ['All data', 'Cells in research stage', 'Commercial cells in standard conditions', 'Automotive packs', 'Cells in development']
+    selected_preset = st.radio('### Preset filters:', preset_options, horizontal=True)
+    if selected_preset == 'Cells in research stage':
+        preset_filters = {'Maturity': 'Research'} 
+    elif selected_preset == 'Commercial cells in standard conditions':
+        preset_filters = {'Maturity': 'Commercial', 'Form factor': [f for f in form_factors if f not in ['Coin cell','Pack','Pack (Cell-to-Pack)']], 'Measurement temperature': (20.0,25.0), 'C rate (charge)': (0.0,1.0), 'C rate (discharge)': (0.0,1.0)}
+    elif selected_preset == 'Automotive packs':
+        preset_filters = {'Maturity': 'Commercial', 'Form factor':['Pack', 'Pack (Cell-to-Pack)']}
+    elif selected_preset == 'Cells in development':
+        preset_filters = {'Maturity':'Development'}
+    return preset_filters
 
 def size_checkbox():
     """
@@ -630,7 +656,6 @@ def convert_df(df):
 page_config()
 layout()
 
-# df = read_csv('data.csv')
 df = read_sql('data')
 df_params = read_sql('parameters')
 rename_columns(df, df_params)
@@ -648,7 +673,7 @@ with st.sidebar:
          'Custom plot',
          'Add data',
          'Source data',
-         'Contact'],
+         'About'],
         icons=['house',
                'battery-full',
                'hourglass-split',
@@ -681,9 +706,9 @@ elif choose == 'Energy plots':
     y = 'Energy density (Wh/L)'
     y2 = 'Specific Power (W/kg)'
     df = df.sort_values(by=groupby)
-
+    preset = filters_preset()
     with st.expander('**Filters**'):
-        df = filters(df, x, y)
+        df = filters(df, x, y, preset)
     size = size_checkbox()
     fig_energy = scatter_plot(df, x, y, f'{y} vs {x}', groupby, size)
     fig_energy = highlight_clusters(fig_energy, df, groupby, x, y)
@@ -714,8 +739,9 @@ elif choose == 'Custom plot':
     else:
         groupby = groupby()
         df = df.sort_values(by=groupby)
+        preset = filters_preset()
         with st.expander('**Filters**'):
-            df = filters(df, x, y)
+            df = filters(df, x, y, preset)
         fig_custom = scatter_plot(df, x, y, f'{y} vs {x}', groupby, size_checkbox())
         if st.checkbox('Hihlight clusters'):
             fig_custom = highlight_clusters(fig_custom, df, groupby, x, y)
@@ -735,7 +761,7 @@ elif choose == 'Add data':
     st.write('### Your new data:')
     st.dataframe(
         df_updated.tail(3).style.apply
-        (lambda x: ['background-color: #333399' if i == df_updated.index[-1] else '' for i in x.index], axis=0))
+        (lambda x: ['background-color: #E6E8E6' if i == df_updated.index[-1] else '' for i in x.index], axis=0))
 
     st.info('***If everything looks ok and you are sure it is correct, click below to upload the data to server.***')
     address = email_prompt()
@@ -754,6 +780,6 @@ elif choose == 'Source data':
     st.markdown('## Parameters description:')
     st.write(df_params[['long_name', 'description']].set_index('long_name'))
 
-elif choose == "Contact":
+elif choose == "About":
     PARAMETERS_DESCRIPTION = ''
     st.write('Author of this website: marcin.w.orzech@gmail.com')

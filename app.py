@@ -437,7 +437,8 @@ def filters_preset():
     preset_filters = {}
     form_factors = df['Form factor'].unique().tolist()
     preset_options = ['All data', 'Cells in research stage', 'Commercial cells in standard conditions', 'Automotive packs', 'Cells in development']
-    selected_preset = st.radio('### Preset filters:', preset_options, horizontal=True)
+    st.markdown('### *Filters preset:*')
+    selected_preset = st.radio('Presets:', preset_options, horizontal=True, label_visibility='collapsed')
     if selected_preset == 'Cells in research stage':
         preset_filters = {'Maturity': 'Research'} 
     elif selected_preset == 'Commercial cells in standard conditions':
@@ -474,7 +475,7 @@ def groupby():
 
     """
     groups = ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor']
-    st.markdown('### Group data by:')
+    st.markdown('### *Group data by:*')
     selected_group = st.radio('**Group data by:**', groups, 1, horizontal=True, label_visibility='collapsed')
     return selected_group
 

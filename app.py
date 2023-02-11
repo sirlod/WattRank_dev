@@ -91,7 +91,7 @@ def layout():
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=600)
 def read_sql(table_name):
     return database.get_table(table_name)
 

@@ -767,7 +767,7 @@ elif choose == 'Add data':
     st.write('### Your new data:')
     st.dataframe(
         df_updated.tail(3).style.apply
-        (lambda x: ['background-color: #E6E8E6' if i == df_updated.index[-1] else '' for i in x.index], axis=0))
+        (lambda x: ['background-color: #8587BD' if i == df_updated.index[-1] else '' for i in x.index], axis=0))
 
     st.info('***If everything looks ok and you are sure it is correct, click below to upload the data to server.***')
     address = email_prompt()

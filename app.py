@@ -91,7 +91,7 @@ def layout():
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
-@st.experimental_memo
+@st.cache_data(ttl=3600)
 def read_sql(table_name):
     return database.get_table(table_name)
 
@@ -645,7 +645,8 @@ def upload_button(inputs, address):
                 reset_state('form')
     if uploaded:
         # clear data from cache, so the updated table will be loaded
-        st.experimental_memo.clear()
+        # st.experimental_memo.clear()
+        st.cache_data.clear()
         return st.success('Thank you for sharing!')
 
 

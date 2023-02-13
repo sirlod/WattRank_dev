@@ -16,9 +16,8 @@ The key to making this project a success is getting a community of people togeth
 
 This is why I invite all researchers and enthusiasts to share their data, whether it's from older publications or current projects. Adding your measurement results will show you exactly, where your material fits in the broad scope of technologies and chemistries out there. And the newly generated plot will be ready to use in your next paper right away!
 
-### Some technical details
+### Technical note
 
 WattRank only includes research papers with full-cell measurement data and data from commercial devices. No half-cell data is considered.
 
-More details coming soon…
 

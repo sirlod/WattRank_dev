@@ -91,7 +91,7 @@ def layout():
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=3600)
 def read_sql(table_name):
     return database.get_table(table_name)
 
@@ -449,6 +449,7 @@ def filters_preset():
         preset_filters = {'Maturity':'Development'}
     return preset_filters
 
+
 def size_checkbox():
     """
     Checkbox to match markers size with cycle life.
@@ -671,14 +672,14 @@ with st.sidebar:
         'WattRank',
         ['Home',
          'Energy plots',
-         'Ragone plot',
+         # 'Ragone plot',
          'Custom plot',
          'Add data',
          'Source data',
          'About'],
         icons=['house',
                'battery-full',
-               'hourglass-split',
+               # 'hourglass-split',
                'graph-up',
                'upload',
                'stack',
@@ -726,8 +727,8 @@ elif choose == 'Energy plots':
     st.plotly_chart(fig_energy, use_container_width=True, theme=None, config=config)
     st.plotly_chart(fig_power, use_container_width=True, theme=None, config=config)
 
-elif choose == 'Ragone plot':
-    st.write('Work in progress...')
+# elif choose == 'Ragone plot':
+#     st.write('Work in progress...')
 
 elif choose == 'Custom plot':
     axes_options = df.columns.drop(['Additional tags', 'Reference/source'])
@@ -788,5 +789,26 @@ elif choose == 'Source data':
     st.write(df_params[['long_name', 'description']].set_index('long_name'))
 
 elif choose == "About":
-    PARAMETERS_DESCRIPTION = ''
-    st.write('Author of this website: marcin.w.orzech@gmail.com')
+    
+    st.title('Hi!')
+    c1, c2 = st.columns([2,1], gap='large')
+    with c2:
+        st.image('me.jpg')
+        st.markdown("""
+                    To contact me regarding the Wattrank or anything else email me at:  
+                    ✉ marcin.w.orzech@gmail.com
+                    
+                    or message on [LinkedIn](https://www.linkedin.com/in/marcin-orzech/)
+                    """)
+    with c1:
+        st.markdown("""
+                I'm Marcin, originally from northern Poland but now residing in Norrköping, Sweden. I work aan a R&D manager at Redox.me, a small company that specializes in creating electrochemical cells for research and materials development. I’m overseeing a range of projects, but my main focus is on designing battery test cells for various in situ measurements.  
+                
+                I completed an Engineering Doctorate (EngD) at Swansea University, where I spent 4 years researching Na-ion batteries for stationary energy storage systems (ESS). I hold two bachelor's degrees - in Materials Engineering and Mechatronics, as well as a Master's degree in Materials Engineering. My passion for batteries started during my Master's program, where for the thesis I tried my chances at making Li-ion cells with SiOx anodes mixed with graphene made in a kitchen blender.  
+                
+                Wattrank came to be as a fun project for me to dive into Python and SQL. I wanted to turn my learning experience into something helpful for others, and so Wattrank was born! I'm always open to feedback and suggestions on how to improve the site. I'm constantly working to improve the technical side of the website and add more data to the plots.  
+                
+                My free time I devote to my family or risk minor injuries while rock climbing. To unwind, I love playing board games with friends, sometimes with a glass of homemade beer. 
+                
+    
+                 """)

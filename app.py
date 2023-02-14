@@ -802,7 +802,7 @@ elif choose == "About":
                     """)
     with c1:
         st.markdown("""
-                I'm Marcin, originally from northern Poland but now residing in Norrköping, Sweden. I work aan a R&D manager at Redox.me, a small company that specializes in creating electrochemical cells for research and materials development. I’m overseeing a range of projects, but my main focus is on designing battery test cells for various in situ measurements.  
+                I'm Marcin, originally from northern Poland but now residing in Norrköping, Sweden. I work as an R&D manager at Redox.me, a small company that specializes in creating electrochemical cells for research and materials development. I’m overseeing a range of projects, but my main focus is on designing battery test cells for various in situ measurements.  
                 
                 I completed an Engineering Doctorate (EngD) at Swansea University, where I spent 4 years researching Na-ion batteries for stationary energy storage systems (ESS). I hold two bachelor's degrees - in Materials Engineering and Mechatronics, as well as a Master's degree in Materials Engineering. My passion for batteries started during my Master's program, where for the thesis I tried my chances at making Li-ion cells with SiOx anodes mixed with graphene made in a kitchen blender.  
                 

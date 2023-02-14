@@ -777,7 +777,7 @@ elif choose == 'Add data':
 
 elif choose == 'Source data':
     st.title('WattRank data:')
-    st.dataframe(df)
+    st.dataframe(df.style.format(thousands="", precision=1))
     st.download_button(
         label="***Download data as .csv***",
         data=convert_df(df),

@@ -52,9 +52,15 @@
     			overflow-y: auto;
     			overflow-x: hidden;
     		}
+            .no-js-message {
+                display: none;
+            }
     	</style>
     </head>
     <body>
+        <div class="no-js-message">
+          <p>Please enable JavaScript to use the app.</p>
+        </div>
     	<iframe src="https://sirlod-wattrank-dev-app-l5lywz.streamlitapp.com/~/+/"
     			frameborder="0"
     			marginheight="0"
@@ -63,5 +69,12 @@
     			height="100%"
     			scrolling="auto">Your browser doesn't support iframes
     </iframe>
+    <script>
+        document.documentElement.className = 'js';
+        if (!document.documentElement.classList.contains('js')) {
+          document.querySelector('.no-js-message').style.display = 'block';
+          document.querySelector('.app-iframe').style.display = 'none';
+        }
+    </script>
     </body>
     </html>

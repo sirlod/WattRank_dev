@@ -793,7 +793,7 @@ elif choose == "About":
     st.title('Hi!')
     c1, c2 = st.columns([2,1], gap='large')
     with c2:
-        st.image('me.jpg')
+        st.image('https://avatars.githubusercontent.com/u/103963175?s=400&u=817001116755a3c8370851e82ed54022a575e0b8&v=4')
         st.markdown("""
                     To contact me regarding the Wattrank or anything else email me at:  
                     ✉ marcin.w.orzech@gmail.com

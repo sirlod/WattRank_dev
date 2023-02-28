@@ -436,7 +436,7 @@ def filters(df, x, y, preset):
 def filters_preset():
     preset_filters = {}
     form_factors = df['Form factor'].unique().tolist()
-    tags = df['Additional tags'].unique().tolist()
+    tags = set(df['Additional tags'].str.split(',').sum())
     preset_options = ['All data', 'Cells in research stage', 'Commercial cells in standard conditions', 'Automotive packs', 'Cells in development']
     st.markdown('### *Filters preset:*')
     selected_preset = st.radio('Presets:', preset_options, horizontal=True, label_visibility='collapsed')

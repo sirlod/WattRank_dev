@@ -436,13 +436,14 @@ def filters(df, x, y, preset):
 def filters_preset():
     preset_filters = {}
     form_factors = df['Form factor'].unique().tolist()
+    tags = df['Additional tags'].unique().tolist()
     preset_options = ['All data', 'Cells in research stage', 'Commercial cells in standard conditions', 'Automotive packs', 'Cells in development']
     st.markdown('### *Filters preset:*')
     selected_preset = st.radio('Presets:', preset_options, horizontal=True, label_visibility='collapsed')
     if selected_preset == 'Cells in research stage':
         preset_filters = {'Maturity': 'Research'} 
     elif selected_preset == 'Commercial cells in standard conditions':
-        preset_filters = {'Maturity': 'Commercial', 'Form factor': [f for f in form_factors if f not in ['Coin cell','Pack','Pack (Cell-to-Pack)']], 'Measurement temperature': (20.0,25.0), 'C rate (charge)': (0.0,1.0), 'C rate (discharge)': (0.0,1.0)}
+        preset_filters = {'Maturity': 'Commercial', 'Form factor': [f for f in form_factors if f not in ['Coin cell','Pack','Pack (Cell-to-Pack)']], 'Measurement temperature': (20.0,26.0), 'Additional tags': [t for t in tags if t not in ['ageing']]}
     elif selected_preset == 'Automotive packs':
         preset_filters = {'Maturity': 'Commercial', 'Form factor':['Pack', 'Pack (Cell-to-Pack)']}
     elif selected_preset == 'Cells in development':

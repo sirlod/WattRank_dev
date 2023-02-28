@@ -20,7 +20,7 @@ HOVER_DATA_DICT = {
             'Specific Power (W/kg)': True,
             'Specific Power - Peak (W/kg)':True,
             'Energy density (Wh/L)': False,
-            'Average OCV': True,
+            'Average Voltage': True,
             'C rate (discharge)': True,
             'C rate (charge)': True,
             'Technology': True,
@@ -377,7 +377,7 @@ def filters(df, x, y, preset):
     # df = clean_axes_data(df, x, y)
     new_df = df.copy()
     filters_multiselect = ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor', 'Maturity', 'Additional tags']
-    filters_slider = ['Specific Energy (Wh/kg)', 'Energy density (Wh/L)', 'Specific Power (W/kg)', 'Specific Power - Peak (W/kg)', 'Average OCV', 'C rate (discharge)', 'C rate (charge)', 'Cycle life', 'Measurement temperature']
+    filters_slider = ['Specific Energy (Wh/kg)', 'Energy density (Wh/L)', 'Specific Power (W/kg)', 'Specific Power - Peak (W/kg)', 'Average Voltage', 'C rate (discharge)', 'C rate (charge)', 'Cycle life', 'Measurement temperature']
     filters_slider = list(set(filters_slider)-set([x, y]))
     all_filters = filters_multiselect + filters_slider
     filters_count = len(all_filters)
@@ -786,7 +786,7 @@ elif choose == 'Source data':
     )
     '---'
     st.markdown('## Parameters description:')
-    st.write(df_params[['long_name', 'description']].set_index('long_name'))
+    st.dataframe(df_params[['long_name', 'description']].set_index('long_name'), use_container_width=True)
 
 elif choose == "About":
     

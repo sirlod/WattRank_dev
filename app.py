@@ -33,7 +33,7 @@ HOVER_DATA_DICT = {
             'Measurement temperature': True,
             'Publication date': True,
             'Maturity': True,
-            'Reference/source': True,
+            'Reference/source': False,
             } 
 
 

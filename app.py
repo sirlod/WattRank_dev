@@ -20,11 +20,12 @@ HOVER_DATA_DICT = {
             'Specific Power (W/kg)': True,
             'Specific Power - Peak (W/kg)':True,
             'Energy density (Wh/L)': False,
-            'Average Voltage': True,
+            'Average Voltage (V)': True,
+            'Internal resistance (mOhm)': True,
             'C rate (discharge)': True,
             'C rate (charge)': True,
-            'Technology': True,
-            'Category': False,
+            'Technology': False,
+            'Category': True,
             'Cathode': True,
             'Anode': True,
             'Electrolyte': True,
@@ -377,7 +378,7 @@ def filters(df, x, y, preset):
     # df = clean_axes_data(df, x, y)
     new_df = df.copy()
     filters_multiselect = ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor', 'Maturity', 'Additional tags']
-    filters_slider = ['Specific Energy (Wh/kg)', 'Energy density (Wh/L)', 'Specific Power (W/kg)', 'Specific Power - Peak (W/kg)', 'Average Voltage', 'C rate (discharge)', 'C rate (charge)', 'Cycle life', 'Measurement temperature']
+    filters_slider = ['Specific Energy (Wh/kg)', 'Energy density (Wh/L)', 'Specific Power (W/kg)', 'Specific Power - Peak (W/kg)', 'Average Voltage (V)', 'C rate (discharge)', 'C rate (charge)', 'Cycle life', 'Measurement temperature', 'Internal resistance (mOhm)']
     filters_slider = list(set(filters_slider)-set([x, y]))
     all_filters = filters_multiselect + filters_slider
     filters_count = len(all_filters)
@@ -788,6 +789,19 @@ elif choose == 'Source data':
     '---'
     st.markdown('## Parameters description:')
     st.dataframe(df_params[['long_name', 'description']].set_index('long_name'), use_container_width=True)
+    '---'
+    st.markdown("""
+                ### Additional references and acknowledgments
+                - Data points 29-74 were aggregated from Enpolite data - https://enpolite.org/ and 
+                *P. Dechent, A. Epp, D. Jöst, Y. Preger, P. M. Attia, W. Li, and D. U. Sauer, 
+                ENPOLITE: Comparing Lithium-Ion Cells across Energy, Power, Lifetime, and Temperature, 
+                ACS Energy Letters 2021 6 (6), 2351-2355*   
+                
+                - Data points 75-142 were collected from Matt Lacey's website (http://lacey.se/) and 
+                *Frith, J.T., Lacey, M.J. & Ulissi, U. 
+                A non-academic perspective on the future of lithium-based batteries. 
+                Nat Commun 14, 420 (2023).*
+                """)
 
 elif choose == "About":
     

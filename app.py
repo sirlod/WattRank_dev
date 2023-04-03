@@ -12,6 +12,7 @@ from streamlit_option_menu import option_menu
 import plotly.express as px
 import numpy as np
 import database
+import plotly.graph_objects as go
 
 
 config = {'displaylogo': False}
@@ -146,7 +147,7 @@ def clean_axes_data(data, x, y):
     return data
 
 
-def scatter_plot(data, x, y, title, group, size):
+def scatter_plot(data, x, y, title, group_color, group_symbol, size):
     """
     Construct layout for basic scatter plot.
 
@@ -160,9 +161,13 @@ def scatter_plot(data, x, y, title, group, size):
         Data column for y axis.
     title : str
         Title of the plot.
-    group : str
+    group_color : str
         Name of the column the markers are grouped by.
         Passed to color and legend.
+        Gets value from the groupby() function.
+    group_symbol : str
+        Name of the column the markers are differentiated by.
+        Passed to symbol.
         Gets value from the groupby() function.
     size : DataSeries
         Column for sizing the markers. Default = None
@@ -177,7 +182,8 @@ def scatter_plot(data, x, y, title, group, size):
     fig = px.scatter(data,
                      x=x,
                      y=y,
-                     color=group,
+                     color=group_color,
+                     symbol=group_symbol,
                      height=600,
                      title=title,
                      hover_name='Name',
@@ -216,22 +222,27 @@ def scatter_plot(data, x, y, title, group, size):
         title_xanchor='center',
         title_yanchor='top',
         )
-    fig = connect_legend_with_clusters(fig)
 
     return fig
 
 
 def connect_legend_with_clusters(fig):
     """Click legend to toggle cluster highlight together with markers."""
-    group_list = df[groupby].unique().tolist()
-    for label in group_list:
-        fig.update_traces(selector=label,
-                          legendgroup=label,
-                          )
+    try:
+        fig.for_each_trace(
+            lambda t: t.update(
+                # legendgroup=t.marker.color,
+                legendgroup=t.name.split(',')[0],
+                legendgrouptitle_text=t.name.split(',')[0],
+                name=t.name.split(',')[1]
+                )
+            )
+    except:
+        pass
     return fig
 
 
-def confidence_ellipse(x, y, n_std=1.9, size=100):
+def confidence_ellipse(x, y, n_std=1.6, size=100):
     """
     Get the covariance confidence ellipse of *x* and *y*.
 
@@ -314,8 +325,11 @@ def highlight_clusters(fig, df, category, x, y):
     """
     category_list = df[category].unique().tolist()
     df = clean_axes_data(df, x, y)
+
     for label in category_list:
-        color = fig.data[category_list.index(label)].marker.color
+        for d in fig.data:
+            if label == d.name.split(',')[0]:
+                color = d.marker.color
         coords = confidence_ellipse(
             df.loc[df[category] == label, x],
             df.loc[df[category] == label, y])
@@ -331,6 +345,7 @@ def highlight_clusters(fig, df, category, x, y):
                   name=label,
                   hoverinfo='skip',
                   )
+    # fig = connect_legend_with_clusters(fig)
     return fig
 
 
@@ -452,7 +467,7 @@ def filters_preset():
     return preset_filters
 
 
-def size_checkbox():
+def size_checkbox(df):
     """
     Checkbox to match markers size with cycle life.
 
@@ -467,20 +482,40 @@ def size_checkbox():
         return size
 
 
-def groupby():
+def groupby(groupby_type):
     """
     Generate radio widget to select column to group by.
+
+    Parameters
+    ----------
+    groupby_type : str
+        Type of grouping ('colour' or 'symbol').
 
     Returns
     -------
     selected_group : str
-        column name of selected group.
-
+        Column name of selected group.
     """
     groups = ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor']
-    st.markdown('### *Group data by:*')
-    selected_group = st.radio('**Group data by:**', groups, 1, horizontal=True, label_visibility='collapsed')
+    st.markdown(f'### *Group datapoints {groupby_type} by:*')
+    selected_group = st.radio(f'**Group data by {groupby_type}:**', groups, 1, horizontal=True, label_visibility='collapsed')
     return selected_group
+
+
+def plot_widgets(df):
+    c1, c2 = st.columns(2)
+    with c1:
+        group_color = groupby('colour')
+    with c2:
+        group_symbol = groupby('symbol')
+    df = df.sort_values(by=group_color)
+    preset = filters_preset()
+
+    with st.sidebar:
+        df = filters(df, x, y, preset)
+
+    size = size_checkbox(df)
+    return group_color, group_symbol, df, preset, size
 
 
 def input_field(parameter):
@@ -552,7 +587,9 @@ def input_field(parameter):
             min_value=0,
             key='form' + parameter + str(st.session_state.form),
             help=help_prompt)
-        if value == 0:
+        if value == 0 and parameter == 'Cycle life':
+            value = 1
+        elif value == 0:
             value = None
     # columns with float data
     else:
@@ -657,7 +694,6 @@ def upload_button(inputs, address):
 def convert_df(df):
     return df.to_csv().encode('utf-8')
 
-
 page_config()
 layout()
 
@@ -704,28 +740,25 @@ if choose == 'Home':
     ABOUT = read_file('readme.md')
     st.title('⚡ WattRank')
     st.markdown(ABOUT)
-
+    '---'
+    # st.write('## Latest update:')
+    # here I want to post the updates 
+    
 elif choose == 'Energy plots':
-    groupby = groupby()
     x = 'Specific Energy (Wh/kg)'
     y = 'Energy density (Wh/L)'
     y2 = 'Specific Power (W/kg)'
-    df = df.sort_values(by=groupby)
-    preset = filters_preset()
 
-    with st.sidebar:
-        df = filters(df, x, y, preset)
-    # with st.expander('**Filters**'):
-    #     df = filters(df, x, y, preset)
-    size = size_checkbox()
-    fig_energy = scatter_plot(df, x, y, f'{y} vs {x}', groupby, size)
-    fig_energy = highlight_clusters(fig_energy, df, groupby, x, y)
+    group_color, group_symbol, df, preset, size = plot_widgets(df)
 
-    fig_power = scatter_plot(df, x, y2, f'{y2} vs {x}', groupby, size)
-    fig_power = highlight_clusters(fig_power, df, groupby, x, y2)
+    fig_energy = scatter_plot(df, x, y, f'{y} vs {x}', group_color, group_symbol, size)
+    fig_energy = highlight_clusters(fig_energy, df, group_color, x, y)
+    fig_energy = connect_legend_with_clusters(fig_energy)
 
-    # plot = st.container()
-    # with main:
+    fig_power = scatter_plot(df, x, y2, f'{y2} vs {x}', group_color, group_symbol, size)
+    fig_power = highlight_clusters(fig_power, df, group_color, x, y2)
+    fig_power = connect_legend_with_clusters(fig_power)
+
     st.plotly_chart(fig_energy, use_container_width=True, theme=None, config=config)
     st.plotly_chart(fig_power, use_container_width=True, theme=None, config=config)
 
@@ -745,20 +778,17 @@ elif choose == 'Custom plot':
     elif x == y:
         st.error('The value for X and Y axes cannot be the same')
     else:
-        groupby = groupby()
-        df = df.sort_values(by=groupby)
-        preset = filters_preset()
-        with st.sidebar:
-            df = filters(df, x, y, preset)
-        # with st.expander('**Filters**'):
-        #     df = filters(df, x, y, preset)
-        fig_custom = scatter_plot(df, x, y, f'{y} vs {x}', groupby, size_checkbox())
-        if st.checkbox('Hihlight clusters'):
-            fig_custom = highlight_clusters(fig_custom, df, groupby, x, y)
-        fig_custom.update_xaxes(rangemode="nonnegative")
-        plot = st.container()
+        group_color, group_symbol, df, preset, size = plot_widgets(df)
 
-        plot.plotly_chart(fig_custom, use_container_width=True, theme=None, config=config)
+        fig_custom = scatter_plot(df, x, y, f'{y} vs {x}', group_color, group_symbol, size)
+
+        if st.checkbox('Hihlight clusters'):
+            fig_custom = highlight_clusters(fig_custom, df, group_color, x, y)
+
+        fig_custom = connect_legend_with_clusters(fig_custom)
+        fig_custom.update_xaxes(rangemode="nonnegative")
+
+        st.plotly_chart(fig_custom, use_container_width=True, theme=None, config=config)
 
 elif choose == 'Add data':
     st.write('## Upload your own data:')
@@ -827,3 +857,4 @@ elif choose == "About":
                 
     
                  """)
+

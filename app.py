@@ -459,9 +459,9 @@ def filters_preset():
     if selected_preset == 'Cells in research stage':
         preset_filters = {'Maturity': 'Research'} 
     elif selected_preset == 'Commercial cells in standard conditions':
-        preset_filters = {'Maturity': 'Commercial', 'Form factor': [f for f in form_factors if f not in ['Coin cell','Pack','Pack (Cell-to-Pack)']], 'Measurement temperature': (20.0,26.0), 'Additional tags': [t for t in tags if t not in ['ageing']]}
+        preset_filters = {'Maturity': 'Commercial', 'Form factor': [f for f in form_factors if f not in ['Coin cell','Pack','Pack (Cell-to-Pack)']], 'Measurement temperature': (20.0,31.0), 'Additional tags': [t for t in tags if t not in ['ageing']]}
     elif selected_preset == 'Automotive packs':
-        preset_filters = {'Maturity': 'Commercial', 'Form factor':['Pack', 'Pack (Cell-to-Pack)']}
+        preset_filters = {'Maturity': 'Commercial', 'Form factor': ['Pack', 'Pack (Cell-to-Pack)'], 'Additional tags': 'EV'}
     elif selected_preset == 'Cells in development':
         preset_filters = {'Maturity':'Development'}
     return preset_filters
@@ -800,7 +800,7 @@ elif choose == 'Add data':
 
     st.write('### Your new data:')
     st.dataframe(
-        df_updated.tail(3).style.apply
+        df_updated.tail(3).style.format(thousands="", precision=1).apply
         (lambda x: ['background-color: #8587BD' if i == df_updated.index[-1] else '' for i in x.index], axis=0))
 
     st.info('***If everything looks ok and you are sure it is correct, click below to upload the data to server.***')

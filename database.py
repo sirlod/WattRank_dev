@@ -7,13 +7,8 @@ Created on Sun May  1 13:21:11 2022.
 
 import os
 import psycopg2
-from dotenv import load_dotenv
 import pandas as pd
-# import streamlit as st
 
-
-load_dotenv()
-# connection = psycopg2.connect(os.environ["DATABASE_URL"])
 columns_in_order = """
                     name,
                     specific_energy,
@@ -70,9 +65,6 @@ def upload_row(values):
             with connection.cursor() as cursor:
                 cursor.execute(RESET_SEQUENCE)
                 cursor.execute(UPLOAD_DATA, values)
-    # except psycopg2.Error as e:
-    # # Print the error message
-    #     st.error(f"Error: {e}")
     finally:
         connection.close()
 

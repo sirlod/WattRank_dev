@@ -25,6 +25,8 @@ HOVER_DATA_DICT = {
             'Internal resistance (mOhm)': True,
             'C rate (discharge)': True,
             'C rate (charge)': True,
+            'Capacity (Ah)': True,
+            'Energy (Wh)': True,
             'Technology': False,
             'Category': True,
             'Cathode': True,
@@ -35,6 +37,7 @@ HOVER_DATA_DICT = {
             'Measurement temperature': True,
             'Publication date': True,
             'Maturity': True,
+            'Additional tags': True,
             'Reference/source': False,
             } 
 
@@ -98,7 +101,7 @@ def read_sql(table_name):
     return database.get_table(table_name)
 
 
-def read_csv(path): #depraciated
+def read_csv(path): #depreciated
     """
     Read the data and assign to df.
 
@@ -227,7 +230,7 @@ def scatter_plot(data, x, y, title, group_color, group_symbol, size):
 
 
 def connect_legend_with_clusters(fig):
-    """Click legend to toggle cluster highlight together with markers."""
+    """Toggles cluster highlight together with markers."""
     try:
         fig.for_each_trace(
             lambda t: t.update(
@@ -375,6 +378,25 @@ def columns_layout(widgets_count):
     return col_list
 
 
+def list_unique_values(parameter):
+    """
+    List all unique text values in the column.
+
+    Parameters
+    ----------
+    parameter : str
+        long name of column.
+
+    Returns
+    -------
+    val_list : set
+
+    """
+    val_list = set(df[parameter].str.split(',').sum())
+    val_list = {val.strip() for val in val_list}
+    return val_list
+
+
 def filters(df, x, y, preset):
     """
     Filter the input data.
@@ -407,13 +429,20 @@ def filters(df, x, y, preset):
     # col_list = columns_layout(filters_count)
 
     # drawing multiselect filters
-    for option in filters_multiselect:
+    for parameter in filters_multiselect:
         # with col_list[filters_multiselect.index(option)]:
-            st.write('---')
-            options_list = set(df[option].str.split(',').sum())
-            selected_option = st.multiselect(option, options_list, default=preset.get(option), key=option + str(st.session_state.filters), help = df_params.loc[df_params['long_name'] == option, 'description'].values[0])
-            if len(selected_option) > 0:
-                new_df = new_df[(new_df[option].isin(selected_option))]
+        st.write('---')
+        options_list = list_unique_values(parameter)
+        selected_option = st.multiselect(
+            parameter,
+            options_list,
+            default=preset.get(parameter),
+            key=parameter + str(st.session_state.filters),
+            help=df_params.loc[df_params['long_name'] == parameter, 'description'].values[0]
+            )
+        if len(selected_option) > 0:
+            new_df = new_df[new_df[parameter].apply(
+                lambda x: any(i.strip() in selected_option for i in x.split(',')))]
 
     # drawing slider filters
     # col_number = len(filters_multiselect)
@@ -452,18 +481,38 @@ def filters(df, x, y, preset):
 def filters_preset():
     preset_filters = {}
     form_factors = df['Form factor'].unique().tolist()
-    tags = set(df['Additional tags'].str.split(',').sum())
-    preset_options = ['All data', 'Cells in research stage', 'Commercial cells in standard conditions', 'Automotive packs', 'Cells in development']
+    tags = list_unique_values('Additional tags')
+    preset_options = [
+        'All data',
+        'Cells in research stage',
+        'Commercial cells in standard conditions',
+        'Automotive packs',
+        'Cells in development'
+        ]
     st.markdown('### *Filters preset:*')
-    selected_preset = st.radio('Presets:', preset_options, horizontal=True, label_visibility='collapsed')
+    selected_preset = st.radio(
+        'Presets:',
+        preset_options,
+        horizontal=True,
+        label_visibility='collapsed'
+        )
     if selected_preset == 'Cells in research stage':
-        preset_filters = {'Maturity': 'Research'} 
+        preset_filters = {'Maturity': 'Research'}
     elif selected_preset == 'Commercial cells in standard conditions':
-        preset_filters = {'Maturity': 'Commercial', 'Form factor': [f for f in form_factors if f not in ['Coin cell','Pack','Pack (Cell-to-Pack)']], 'Measurement temperature': (20.0,31.0), 'Additional tags': [t for t in tags if t not in ['ageing']]}
+        preset_filters = {
+            'Maturity': 'Commercial',
+            'Form factor': [f for f in form_factors if f not in ['Coin cell', 'Pack', 'Pack (Cell-to-Pack)']],
+            'Measurement temperature': (20.0, 31.0),
+            'Additional tags': [t for t in tags if t not in ['ageing']]
+            }
     elif selected_preset == 'Automotive packs':
-        preset_filters = {'Maturity': 'Commercial', 'Form factor': ['Pack', 'Pack (Cell-to-Pack)'], 'Additional tags': 'EV'}
+        preset_filters = {
+            'Maturity': 'Commercial',
+            'Form factor': ['Pack', 'Pack (Cell-to-Pack)'],
+            'Additional tags': 'EV'
+            }
     elif selected_preset == 'Cells in development':
-        preset_filters = {'Maturity':'Development'}
+        preset_filters = {'Maturity': 'Development'}
     return preset_filters
 
 
@@ -538,7 +587,7 @@ def input_field(parameter):
             placeholder=f'Type in {parameter} (required)')
     # columns with predetermined values to select from. no new values allowed
     elif parameter in ['Capacity calculation method', 'Maturity']:
-        options_list = set(df[parameter].str.split(',').sum())
+        options_list = list_unique_values(parameter)
         value = st.multiselect(
             label,
             options_list,
@@ -548,7 +597,7 @@ def input_field(parameter):
         value = ''.join(value)
     # columns with options to select from, but with possibility to add new values
     elif parameter in ['Technology', 'Category', 'Cathode', 'Anode', 'Electrolyte', 'Form factor']:
-        options_list = set(df[parameter].str.split(',').sum())
+        options_list = list_unique_values(parameter)
         field = st.empty()
         new_value = st.checkbox('Value not in the list. Add new value', key=parameter + str(st.session_state.form))
         value = field.multiselect(
@@ -609,14 +658,12 @@ def input_form():
     inputs = {}
     # Layout into columns
     col_list = columns_layout(len(df.columns))
-    # with st.form(key='Upload data',clear_on_submit=True):
     # drawing text input fields
     for parameter in df.columns:
         with col_list[df.columns.get_loc(parameter)]:
             st.write('---')
             value = input_field(parameter)
             inputs[parameter] = value
-        # submitted = st.form_submit_button('Submit')
     return inputs
 
 
@@ -645,10 +692,10 @@ def check_duplicates(data):
 
 
 def send_data_to_database(data: dict):
-    cols = df_params['short_name'].tolist()
-    cols = ','.join(cols)
+    # cols = df_params['short_name'].tolist()
+    # cols = ','.join(cols)
     values = list(data.values())
-    database.upload_row(cols, values)
+    database.upload_row(values)
 
 
 def email_prompt():
@@ -693,6 +740,7 @@ def upload_button(inputs, address):
 # @st.cache
 def convert_df(df):
     return df.to_csv().encode('utf-8')
+
 
 page_config()
 layout()
@@ -818,7 +866,8 @@ elif choose == 'Source data':
     )
     '---'
     st.markdown('## Parameters description:')
-    st.dataframe(df_params[['long_name', 'description']].set_index('long_name'), use_container_width=True)
+    st.dataframe(df_params[['long_name', 'description']].set_index('long_name'),
+                 use_container_width=True)
     '---'
     st.markdown("""
                 ### Additional references and acknowledgments

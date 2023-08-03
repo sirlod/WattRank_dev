@@ -89,7 +89,7 @@ def layout():
     # Hide footer and hamburger menu
     hide_streamlit_style = """
                 <style>
-                #MainMenu {visibility: hidden;}
+                
                 footer {visibility: hidden;}
                 </style>
                 """

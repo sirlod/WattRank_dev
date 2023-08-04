@@ -883,7 +883,7 @@ elif choose == 'Source data':
                 """)
 
 elif choose == "About":
-    
+
     st.title('Hi!')
     c1, c2 = st.columns([2,1], gap='large')
     with c2:
@@ -903,7 +903,17 @@ elif choose == "About":
                 Wattrank came to be as a fun project for me to dive into Python and SQL. I wanted to turn my learning experience into something helpful for others, and so Wattrank was born! I'm always open to feedback and suggestions on how to improve the site. I'm constantly working to improve the technical side of the website and add more data to the plots.  
                 
                 My free time I devote to my family or risk minor injuries while rock climbing. To unwind, I love playing board games with friends, sometimes with a glass of homemade beer. 
-                
-    
+
                  """)
 
+    st.markdown("""
+                ### Licensing and citing
+                The content of this project itself is licensed under the
+                [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
+                and the underlying source code used to format
+                and display that content is licensed under the
+                [GPL-3.0 license](https://github.com/sirlod/WattRank_dev/blob/main/LICENSE).
+                
+                If you are using Wattrank in your work, please cite  as (or accordingly to your prefered citation style):  
+                Orzech, M. W.; *WattRank - Compare energy storage devices.*; WattRank.; https://wattrank.com/  (access date: )
+                """)

@@ -446,8 +446,8 @@ def filters(df, x, y, preset):
         "Internal resistance (mOhm)",
     ]
     filters_slider = list(set(filters_slider) - set([x, y]))
-    all_filters = filters_multiselect + filters_slider
-    filters_count = len(all_filters)
+    # all_filters = filters_multiselect + filters_slider
+    # filters_count = len(all_filters)
     st.markdown("## *Filters:*")
 
     # reseting filters using session state count
@@ -474,7 +474,8 @@ def filters(df, x, y, preset):
         if len(selected_option) > 0:
             new_df = new_df[
                 new_df[parameter].apply(
-                    lambda x: any(i.strip() in selected_option for i in x.split(","))
+                    lambda x: any(i.strip() in selected_option
+                                  for i in x.split(","))
                 )
             ]
 
@@ -864,6 +865,7 @@ rename_columns(df, df_params)
 df = replace_nan(df)
 session_state_init("filters")
 session_state_init("form")
+session_state_init("calc")
 
 # Multipage menu
 with st.sidebar:

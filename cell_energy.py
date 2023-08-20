@@ -386,50 +386,87 @@ def input_fields():
 
     with col2:
         st.markdown("### +ve")
-        input_dict["p_specific_cap"] = st.number_input("mAh/g", value=175)
-        input_dict["p_areal_cap"] = st.number_input("mAh/cm2", value=3.73)
-        input_dict["p_massfrac"] = st.number_input("mass fraction", value=0.94)
-        input_dict["p_density"] = st.number_input("density, g/cc", value=3.5)
-        input_dict["p_nominalV"] = st.number_input("average E, V", value=3.75)
-        input_dict["p_arealR"] = st.number_input("R, Ohm cm2", value=7)
-        input_dict["p_firstloss"] = st.number_input("first cyc. loss %",
-                                                    value=7)
+        input_dict["p_specific_cap"] = st.number_input(
+            "mAh/g", value=175,
+            key="p_specific_cap" + str(st.session_state.calc))
+        input_dict["p_areal_cap"] = st.number_input(
+            "mAh/cm2", value=3.73,
+            key="p_areal_cap" + str(st.session_state.calc))
+        input_dict["p_massfrac"] = st.number_input(
+            "mass fraction", value=0.94,
+            key="p_massfrac" + str(st.session_state.calc))
+        input_dict["p_density"] = st.number_input(
+            "density, g/cc", value=3.5,
+            key="p_density" + str(st.session_state.calc))
+        input_dict["p_nominalV"] = st.number_input(
+            "average E, V", value=3.75,
+            key="p_nominalV" + str(st.session_state.calc))
+        input_dict["p_arealR"] = st.number_input(
+            "R, Ohm cm2", value=7,
+            key="p_arealR" + str(st.session_state.calc))
+        input_dict["p_firstloss"] = st.number_input(
+            "first cyc. loss %", value=7,
+            key="p_firstloss" + str(st.session_state.calc))
 
     with col3:
         st.markdown("### separator")
-        input_dict["s_thickness"] = st.number_input("thickness / um", value=16)
-        input_dict["s_porosity"] = st.number_input("porosity", value=0.44)
-        input_dict["s_bulkdensity"] = st.number_input("bulk density, g/cc",
-                                                      value=0.855)
+        input_dict["s_thickness"] = st.number_input(
+            "thickness / um", value=16,
+            key="s_thickness" + str(st.session_state.calc))
+        input_dict["s_porosity"] = st.number_input(
+            "porosity", value=0.44,
+            key="s_porosity" + str(st.session_state.calc))
+        input_dict["s_bulkdensity"] = st.number_input(
+            "bulk density, g/cc", value=0.855,
+            key="s_bulkdensity" + str(st.session_state.calc))
         st.markdown("---")
         st.markdown("### electrolyte")
-        input_dict["e_ratio"] = st.number_input("el'yte vol, mL/Ah", value=1.8)
-        input_dict["e_density"] = st.number_input("density, g/cc", value=1.22)
+        input_dict["e_ratio"] = st.number_input(
+            "electrolyte vol, mL/Ah", value=1.8,
+            key="e_ratio" + str(st.session_state.calc))
+        input_dict["e_density"] = st.number_input(
+            "density, g/cc", value=1.22,
+            key="e_density" + str(st.session_state.calc))
 
     with col4:
         st.markdown("### -ve")
-        input_dict["n_specific_cap"] = st.number_input("mAh/g", value=350)
-        input_dict["n_areal_cap"] = st.number_input("mAh/cm2", value=4.13)
-        input_dict["n_massfrac"] = st.number_input("mass fraction",
-                                                   value=0.954)
-        input_dict["n_density"] = st.number_input("density, g/cc", value=1.55)
-        input_dict["n_nominalV"] = st.number_input("average E, V", value=0.1)
-        input_dict["n_arealR"] = st.number_input("R, Ohm cm2", value=5)
-        input_dict["n_firstloss"] = st.number_input("first cyc. loss %",
-                                                    value=10)
+        input_dict["n_specific_cap"] = st.number_input(
+            "mAh/g", value=350,
+            key="n_specific_cap" + str(st.session_state.calc))
+        input_dict["n_areal_cap"] = st.number_input(
+            "mAh/cm2", value=4.13,
+            key="n_areal_cap" + str(st.session_state.calc))
+        input_dict["n_massfrac"] = st.number_input(
+            "mass fraction", value=0.954,
+            key="n_massfrac" + str(st.session_state.calc))
+        input_dict["n_density"] = st.number_input(
+            "density, g/cc", value=1.55,
+            key="n_density" + str(st.session_state.calc))
+        input_dict["n_nominalV"] = st.number_input(
+            "average E, V", value=0.1,
+            key="n_nominalV" + str(st.session_state.calc))
+        input_dict["n_arealR"] = st.number_input(
+            "R, Ohm cm2", value=5,
+            key="n_arealR" + str(st.session_state.calc))
+        input_dict["n_firstloss"] = st.number_input(
+            "first cyc. loss %", value=10,
+            key="n_firstloss" + str(st.session_state.calc))
 
     with col5:
         st.markdown("### current coll.")
-        input_dict["p_cc_thickness"] = st.number_input("+ve thickness / µm",
-                                                       value=15)
+        input_dict["p_cc_thickness"] = st.number_input(
+            "+ve thickness / µm", value=15,
+            key="p_cc_thickness" + str(st.session_state.calc))
         st.markdown("---")
-        n_cc_type = st.radio("-ve c.c.", ("Cu", "Al"))
+        n_cc_type = st.radio("-ve c.c.", ("Cu", "Al"),
+                             key=st.session_state.calc)
         if n_cc_type == "Al":
             input_dict["n_cc_density"] = 2.7
         else:
             input_dict["n_cc_density"] = 8.95
-        input_dict["n_cc_thickness"] = st.number_input("-ve thickness / µm",
-                                                       value=8)
+        input_dict["n_cc_thickness"] = st.number_input(
+            "-ve thickness / µm", value=8,
+            key="n_cc_thickness" + str(st.session_state.calc))
 
     return input_dict
 
@@ -515,11 +552,13 @@ def run_calc():
     st.subheader("Cell type:")
     celltype = st.radio("type", ("18650", "21700"),
                         label_visibility="collapsed")
+    if st.button("Reset values to default"):
+        st.session_state["calc"] += 1
     user_inputs = input_fields()
 
-    "---"
+    st.write("---")
 
-    calculate_button = st.button("Calculate")
+    calculate_button = st.button("Calculate❕", type="primary")
     if calculate_button:
         calculated_data = cyl_calculate(**user_inputs, **cell_param(celltype))
 

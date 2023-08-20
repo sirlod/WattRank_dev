@@ -503,7 +503,7 @@ def ui():
         """
         Author: *Matt Lacey*, adapted to Wattrank by *Marcin Orzech*.  
         This calculator was originally developed by Matt Lacey 
-        and available lacey.se
+        and published on lacey.se.
         """
     )
     st.write("---")

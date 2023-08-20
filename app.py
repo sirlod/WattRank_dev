@@ -12,6 +12,7 @@ from streamlit_option_menu import option_menu
 import plotly.express as px
 import numpy as np
 import database
+import WattRank_dev.cell_energy as cell_energy
 
 
 config = {"displaylogo": False}
@@ -875,6 +876,7 @@ with st.sidebar:
             "Custom plot",
             "Add data",
             "Source data",
+            "Cell energy calculator",
             "About",
         ],
         icons=[
@@ -884,6 +886,7 @@ with st.sidebar:
             "graph-up",
             "upload",
             "stack",
+            "calculator",
             "person lines fill",
         ],
         menu_icon="lightning-charge",
@@ -1026,6 +1029,9 @@ elif choose == "Source data":
                 Nat Commun 14, 420 (2023).*
                 """
     )
+
+elif choose == "Cell energy calculator":
+    cell_energy.run_calc() 
 
 elif choose == "About":
     st.title("Hi!")

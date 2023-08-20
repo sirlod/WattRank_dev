@@ -499,7 +499,14 @@ def ui():
         Adjust the values in the boxes below and press 'Calculate'
         to see the results.  """
     )
-    "---"
+    st.markdown(
+        """
+        Author: *Matt Lacey*, adapted to Wattrank by *Marcin Orzech*.  
+        This calculator was originally developed by Matt Lacey 
+        and available lacey.se
+        """
+    )
+    st.write("---")
 
 
 def run_calc():

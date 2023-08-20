@@ -12,7 +12,7 @@ from streamlit_option_menu import option_menu
 import plotly.express as px
 import numpy as np
 import database
-import WattRank_dev.cell_energy as cell_energy
+import cell_energy
 
 
 config = {"displaylogo": False}

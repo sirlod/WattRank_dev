@@ -471,51 +471,74 @@ def input_fields():
     return input_dict
 
 
-def print_results(calculated_data):
-    st.subheader("Results")
-    st.write(
-        f"Cell capacity: \
-            {calculated_data['cell']['capacity']:.2f} Ah | \
-            {calculated_data['cell']['mass']:.1f} g"
-    )
-    st.write(
-        f"Cell energy: \
-            {calculated_data['cell']['energy']:.1f} Wh | \
-            {calculated_data['cell']['energy_grav']:.1f} Wh/kg | \
-            {calculated_data['cell']['energy_vol']:.1f} Wh/L"
-    )
-    st.write(
-        f"First cycle capacity loss: \
-            {calculated_data['cell']['firstcycleloss'] * 100:.1f}%"
-    )
+def formated_results(calculated_data, celltype):
     resistance = (
         1000 *
         (calculated_data['p']['arealR'] + calculated_data['n']['arealR']) /
         calculated_data['jellyroll']['area']
-        )
-    st.write(
-        f"Estimated cell resistance: {resistance:.2f} mΩ"
     )
+    np_ratio = (
+        calculated_data['n']['areal_cap'] / calculated_data['p']['areal_cap'])
+    voltage = (
+        calculated_data['p']['nominalV'] - calculated_data['n']['nominalV'])
+
+    results = {
+        "capacity": calculated_data['cell']['capacity'],
+        "mass": calculated_data['cell']['mass'],
+        "energy": calculated_data['cell']['energy'],
+        "energy_grav": calculated_data['cell']['energy_grav'],
+        "energy_vol": calculated_data['cell']['energy_vol'],
+        "firstcycleloss": calculated_data['cell']['firstcycleloss'],
+        "resistance": resistance,
+        "turns": calculated_data['jellyroll']['turns'],
+        "length": calculated_data['jellyroll']['length'],
+        "area": calculated_data['jellyroll']['area'],
+        "comp_thickness_p": calculated_data['p']['comp_thickness'] * 10000,
+        "comp_thickness_n": calculated_data['n']['comp_thickness'] * 10000,
+        "np_ratio": np_ratio,
+        "voltage": voltage,
+        "capacity_grav": (calculated_data['cell']['capacity']
+                          / calculated_data['cell']['mass']*1000),
+        "capacity_vol": (calculated_data['cell']['energy_vol'] / voltage),
+        "form_factor": "Cylindrical " + celltype
+    }
+    return results
+
+
+def print_results(results):
+
+    st.subheader("Results")
     st.write(
-        f"Jellyroll: \
-            {calculated_data['jellyroll']['turns']:.1f} turns; \
-            length: {calculated_data['jellyroll']['length']:.2f} cm; \
-            total electrode area: \
-                {2 * calculated_data['jellyroll']['area']:.2f} cm^2"
-    )
-    np_ratio = (calculated_data['n']['areal_cap']
-                / calculated_data['p']['areal_cap'])
-    st.write(
-        f"+ve electrode: \
-            {calculated_data['p']['comp_thickness'] * 10000:.1f} µm thick | \
-        -ve electrode: \
-            {calculated_data['n']['comp_thickness'] * 10000:.1f} µm | \
-        n/p ratio: \
-            {np_ratio:.1f}"
+        f"Cell capacity: {results['capacity']:.2f} Ah | "
+        f"{results['mass']:.1f} g"
     )
 
-    st.plotly_chart(plot_mass(calculated_data), use_container_width=True)
-    st.plotly_chart(plot_cross_section(calculated_data))
+    st.write(
+        f"Cell energy: {results['energy']:.1f} Wh | "
+        f"{results['energy_grav']:.1f} Wh/kg | "
+        f"{results['energy_vol']:.1f} Wh/L"
+    )
+
+    st.write(
+        f"First cycle capacity loss: "
+        f"{results['firstcycleloss'] * 100:.1f}%"
+    )
+
+    st.write(
+        f"Estimated cell resistance: {results['resistance']:.2f} mΩ"
+    )
+
+    st.write(
+        f"Jellyroll: {results['turns']:.1f} turns; "
+        f"length: {results['length']:.2f} cm; "
+        f"total electrode area: {2 * results['area']:.2f} cm^2"
+    )
+
+    st.write(
+        f"+ve electrode: {results['comp_thickness_p']:.1f} µm thick | "
+        f"-ve electrode: {results['comp_thickness_n']:.1f} µm | "
+        f"n/p ratio: {results['np_ratio']:.1f}"
+    )
 
 
 def ui():
@@ -561,9 +584,14 @@ def run_calc():
     calculate_button = st.button("Calculate❕", type="primary")
     if calculate_button:
         calculated_data = cyl_calculate(**user_inputs, **cell_param(celltype))
+        results = formated_results(calculated_data, celltype)
 
-        print_results(calculated_data)
+        print_results(results)
+        st.plotly_chart(plot_mass(calculated_data), use_container_width=True)
+        st.plotly_chart(plot_cross_section(calculated_data))
+
+        return results
 
 
-if __name__ == "__main__":
-    run_calc()
+# if __name__ == "__main__":
+#     run_calc()

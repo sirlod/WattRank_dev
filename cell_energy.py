@@ -471,7 +471,7 @@ def input_fields():
     return input_dict
 
 
-def formated_results(calculated_data, celltype):
+def formatted_results(calculated_data, celltype):
     resistance = (
         1000 *
         (calculated_data['p']['arealR'] + calculated_data['n']['arealR']) /
@@ -483,24 +483,30 @@ def formated_results(calculated_data, celltype):
         calculated_data['p']['nominalV'] - calculated_data['n']['nominalV'])
 
     results = {
-        "capacity": calculated_data['cell']['capacity'],
+        "Capacity (Ah)": calculated_data['cell']['capacity'],
         "mass": calculated_data['cell']['mass'],
-        "energy": calculated_data['cell']['energy'],
-        "energy_grav": calculated_data['cell']['energy_grav'],
-        "energy_vol": calculated_data['cell']['energy_vol'],
+        "Energy (Wh)": calculated_data['cell']['energy'],
+        "Specific Energy (Wh/kg)": calculated_data['cell']['energy_grav'],
+        "Energy density (Wh/L)": calculated_data['cell']['energy_vol'],
         "firstcycleloss": calculated_data['cell']['firstcycleloss'],
-        "resistance": resistance,
+        "Internal resistance (mOhm)": resistance,
         "turns": calculated_data['jellyroll']['turns'],
         "length": calculated_data['jellyroll']['length'],
         "area": calculated_data['jellyroll']['area'],
         "comp_thickness_p": calculated_data['p']['comp_thickness'] * 10000,
         "comp_thickness_n": calculated_data['n']['comp_thickness'] * 10000,
         "np_ratio": np_ratio,
-        "voltage": voltage,
-        "capacity_grav": (calculated_data['cell']['capacity']
-                          / calculated_data['cell']['mass']*1000),
-        "capacity_vol": (calculated_data['cell']['energy_vol'] / voltage),
-        "form_factor": "Cylindrical " + celltype
+        "Average Voltage (V)": voltage,
+        "Specific capacity (Ah/kg)": (calculated_data['cell']['capacity']
+                                      / calculated_data['cell']['mass']*1000),
+        "Volumetric capacity (Ah/L)": (calculated_data['cell']['energy_vol']
+                                       / voltage),
+        "Name": "Calculated cell nr " + str(st.session_state.df_state + 1),
+        "Form factor": "Cylindrical " + celltype,
+        "Capacity calculation method": "Cell",
+        "Technology": "Battery",
+        "Category": "Calculated",
+        "Cycle life": 1
     }
     return results
 
@@ -509,28 +515,29 @@ def print_results(results):
 
     st.subheader("Results")
     st.write(
-        f"Cell capacity: {results['capacity']:.2f} Ah | "
+        f"**Cell capacity:** {results['Capacity (Ah)']:.2f} Ah | "
         f"{results['mass']:.1f} g"
     )
 
     st.write(
-        f"Cell energy: {results['energy']:.1f} Wh | "
-        f"{results['energy_grav']:.1f} Wh/kg | "
-        f"{results['energy_vol']:.1f} Wh/L"
+        f"**Cell energy:** {results['Energy (Wh)']:.1f} Wh | "
+        f"{results['Specific Energy (Wh/kg)']:.1f} Wh/kg | "
+        f"{results['Energy density (Wh/L)']:.1f} Wh/L"
     )
 
     st.write(
-        f"First cycle capacity loss: "
+        f"**First cycle capacity loss:** "
         f"{results['firstcycleloss'] * 100:.1f}%"
     )
 
     st.write(
-        f"Estimated cell resistance: {results['resistance']:.2f} mΩ"
+        f"**Estimated cell resistance:** "
+        f"{results['Internal resistance (mOhm)']:.2f} mΩ"
     )
 
     st.write(
-        f"Jellyroll: {results['turns']:.1f} turns; "
-        f"length: {results['length']:.2f} cm; "
+        f"**Jellyroll:** turns {results['turns']:.1f} "
+        f"length: {results['length']:.2f} cm;"
         f"total electrode area: {2 * results['area']:.2f} cm^2"
     )
 
@@ -555,9 +562,8 @@ def ui():
         calculations. The default values for the positive and negative 
         electrodes are based on the suggested baseline data for NMC532 
         vs graphite presented by 
-        *Harlow et al, J. Electrochem. Soc. 166 (13) A3031-A3044 (2019)*.
-        Adjust the values in the boxes below and press 'Calculate'
-        to see the results.  """
+        *Harlow et al, J. Electrochem. Soc. 166 (13) A3031-A3044 (2019)*.  
+        """
     )
     st.markdown(
         """
@@ -565,6 +571,11 @@ def ui():
         This calculator was originally developed by Matt Lacey 
         and published on lacey.se.
         """
+    )
+    st.info(
+        """Adjust the values in the boxes below and press 'Calculate'
+        to see the results. The results of the calculations are
+        automatically added to all plots with 'Calculated' category."""
     )
     st.write("---")
 
@@ -584,11 +595,13 @@ def run_calc():
     calculate_button = st.button("Calculate❕", type="primary")
     if calculate_button:
         calculated_data = cyl_calculate(**user_inputs, **cell_param(celltype))
-        results = formated_results(calculated_data, celltype)
-
-        print_results(results)
+        results = formatted_results(calculated_data, celltype)
+        c1, c2 = st.columns(2)
+        with c1:
+            print_results(results)
+        with c2:
+            st.plotly_chart(plot_cross_section(calculated_data))
         st.plotly_chart(plot_mass(calculated_data), use_container_width=True)
-        st.plotly_chart(plot_cross_section(calculated_data))
 
         return results
 

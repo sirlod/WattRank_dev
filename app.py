@@ -95,7 +95,9 @@ def layout():
 
 @st.cache_data(ttl=3600)
 def read_sql(table_name):
-    return database.get_table(table_name)
+    if table_name not in st.session_state:
+        st.session_state[table_name] = database.get_table(table_name)
+    return st.session_state[table_name]
 
 
 def read_csv(path):  # depreciated
@@ -115,6 +117,13 @@ def read_csv(path):  # depreciated
     return pd.read_csv(path)
 
 
+def fetch_latest_data():
+    if st.session_state["df_state"] == 0:
+        return read_sql("data")
+    else:
+        return st.session_state.data
+
+
 def rename_columns(df, df_params):
     name_map = dict(zip(df_params["short_name"], df_params["long_name"]))
     df.rename(columns=name_map, inplace=True)
@@ -122,9 +131,9 @@ def rename_columns(df, df_params):
 
 def replace_nan(dataframe):
     """Replace NaN values with 'None' in non numerical columns."""
-    object_cols = df.select_dtypes(["object"]).fillna("_No data_")
-    df[object_cols.columns] = object_cols
-    return df
+    object_cols = dataframe.select_dtypes(["object"]).fillna("_No data_")
+    dataframe[object_cols.columns] = object_cols
+    return dataframe
 
 
 def clean_axes_data(data, x, y):
@@ -856,16 +865,25 @@ def convert_df(df):
     return df.to_csv().encode("utf-8")
 
 
+def add_data_to_df(df, new_data):
+    new_data = {col: new_data[col] for col in df.columns if col in new_data}
+    st.session_state.data = pd.concat(
+    [df, pd.DataFrame(new_data, index=[len(df)])], ignore_index=True,
+    )
+    return st.session_state.data
+
+
 page_config()
 layout()
 
-df = read_sql("data")
-df_params = read_sql("parameters")
-rename_columns(df, df_params)
-df = replace_nan(df)
 session_state_init("filters")
 session_state_init("form")
 session_state_init("calc")
+session_state_init("df_state")
+df = fetch_latest_data()
+df_params = read_sql("parameters")
+rename_columns(df, df_params)
+df = replace_nan(df)
 
 # Multipage menu
 with st.sidebar:
@@ -1033,7 +1051,29 @@ elif choose == "Source data":
     )
 
 elif choose == "Cell energy calculator":
-    cell_energy.run_calc() 
+    calc_data = cell_energy.run_calc()
+    if calc_data:
+        df = add_data_to_df(df, calc_data)
+        st.dataframe(
+            df.tail(st.session_state.df_state+1)
+            .style.format(thousands="", precision=1)
+            .apply(
+                lambda x: [
+                    "background-color: #8587BD" if i == df.index[-1]
+                    else "" for i in x.index
+                ],
+                axis=0,
+            )
+        )
+        reset_state("df_state")
+        st.download_button(
+            label="***Download calculation results***",
+            data=convert_df(df.tail(st.session_state.df_state)),
+            file_name="WattRank.csv",
+            mime="text/csv",
+        )
+    if st.button("Clean all calculation results"):
+        st.session_state.df_state = 0
 
 elif choose == "About":
     st.title("Hi!")

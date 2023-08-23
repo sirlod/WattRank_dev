@@ -506,7 +506,8 @@ def formatted_results(calculated_data, celltype):
         "Capacity calculation method": "Cell",
         "Technology": "Battery",
         "Category": "Calculated",
-        "Cycle life": 1
+        "Cycle life": 1,
+        "Maturity": "Commercial, Development, Research"
     }
     return results
 

@@ -8,6 +8,7 @@ Created on Sun May  1 13:21:11 2022.
 # Import Python Libraries
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 from streamlit_option_menu import option_menu
 import plotly.express as px
 import numpy as np
@@ -873,6 +874,51 @@ def add_data_to_df(df, new_data):
     return st.session_state.data
 
 
+def kofi_button():
+    button = """
+        <body>
+        <style>
+            .floatingchat-container-wrap {
+                position:fixed;
+                bottom:16px;
+                left:170px;
+                z-index:99999999!important;
+                width:100%;
+                height:65px;
+                max-width:180px
+            }
+        </style>
+        <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+            <script>
+            kofiWidgetOverlay.draw('marcinorzech', {
+                'type': 'floating-chat',
+                'floating-chat.donateButton.text': 'Support me',
+                'floating-chat.donateButton.background-color': '#d9534f',
+                'floating-chat.donateButton.text-color': '#fff',
+            });
+            </script>
+        </body>
+    """
+    return button
+
+
+def float_button(button):
+    components.html(button, height=712, width=350)
+
+    st.markdown(
+        """
+        <style>
+            iframe[width="350"] {
+                position: fixed;
+                bottom: 10px;
+                right: 30px;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 page_config()
 layout()
 
@@ -929,8 +975,7 @@ if choose == "Home":
     st.title("⚡ WattRank")
     st.markdown(ABOUT)
     "---"
-    # st.write('## Latest update:')
-    # here I want to post the updates
+    float_button(kofi_button())
 
 elif choose == "Energy plots":
     x = "Specific Energy (Wh/kg)"
@@ -1090,6 +1135,20 @@ elif choose == "About":
             or message on [LinkedIn](https://www.linkedin.com/in/marcin-orzech/)
             """
         )
+        st.info(
+        """
+        
+        I develop this website in my free time and aim to keep it free to use
+        for all and with full access to the data. If you find Wattrank useful and 
+        want to support its development or just want to show apprieciation, 
+        please consider buying me a cup of coffee. It will keep me motivated 
+        and help with the running costs of this site!
+        
+        [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/E1E3OIB2R)
+        
+        """
+        )
+
     with c1:
         st.markdown(
             """
@@ -1104,16 +1163,16 @@ elif choose == "About":
                 """
         )
 
-    st.markdown(
-        """
-                ### Licensing and citing
-                The content of this project itself is licensed under the
-                [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
-                and the underlying source code used to format
-                and display that content is licensed under the
-                [GPL-3.0 license](https://github.com/sirlod/WattRank_dev/blob/main/LICENSE).
-                
-                If you are using Wattrank in your work, please cite  as (or accordingly to your prefered citation style):  
-                Orzech, M. W.; *WattRank - Compare energy storage devices.*; WattRank.; https://wattrank.com/  (access date: )
-                """
-    )
+        st.markdown(
+            """
+                    ### Licensing and citing
+                    The content of this project itself is licensed under the
+                    [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
+                    and the underlying source code used to format
+                    and display that content is licensed under the
+                    [GPL-3.0 license](https://github.com/sirlod/WattRank_dev/blob/main/LICENSE).
+                    
+                    If you are using Wattrank in your work, please cite  as (or accordingly to your prefered citation style):  
+                    Orzech, M. W.; *WattRank - Compare energy storage devices.*; WattRank.; https://wattrank.com/  (access date: )
+                    """
+        )

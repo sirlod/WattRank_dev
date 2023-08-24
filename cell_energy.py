@@ -365,8 +365,8 @@ def plot_cross_section(calculated_data):
         showlegend=False,
         xaxis=dict(ticks="outside", tickvals=np.arange(-12, 12, 2)),
         yaxis=dict(showticklabels=False, scaleanchor="x", scaleratio=1),
-        width=360,
-        height=360,
+        # width=360,
+        height=320,
         xaxis_range=(-12, 12),
         xaxis_showgrid=True,
         xaxis_showline=True,
@@ -601,7 +601,7 @@ def run_calc():
         with c1:
             print_results(results)
         with c2:
-            st.plotly_chart(plot_cross_section(calculated_data))
+            st.plotly_chart(plot_cross_section(calculated_data), use_container_width=True)
         st.plotly_chart(plot_mass(calculated_data), use_container_width=True)
 
         return results

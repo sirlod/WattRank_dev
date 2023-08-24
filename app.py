@@ -874,6 +874,32 @@ def add_data_to_df(df, new_data):
     return st.session_state.data
 
 
+# def kofi_button():
+#     button = """
+#         <body>
+#         <style>
+#             .floatingchat-container-wrap {
+#                 position:fixed;
+#                 bottom:16px;
+#                 left:170px;
+#                 z-index:99999999!important;
+#                 width:100%;
+#                 height:65px;
+#                 max-width:180px
+#             }
+#         </style>
+#         <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+#             <script>
+#             kofiWidgetOverlay.draw('marcinorzech', {
+#                 'type': 'floating-chat',
+#                 'floating-chat.donateButton.text': 'Support me',
+#                 'floating-chat.donateButton.background-color': '#d9534f',
+#                 'floating-chat.donateButton.text-color': '#fff',
+#             });
+#             </script>
+#         </body>
+#     """
+#     return button
 def kofi_button():
     button = """
         <body>
@@ -885,7 +911,7 @@ def kofi_button():
                 z-index:99999999!important;
                 width:100%;
                 height:65px;
-                max-width:180px
+                max-width:180px;
             }
         </style>
         <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
@@ -901,17 +927,16 @@ def kofi_button():
     """
     return button
 
-
 def float_button(button):
-    components.html(button, height=712, width=350)
+    components.html(button, height=650, width=355)
 
     st.markdown(
         """
         <style>
-            iframe[width="350"] {
+            iframe[width="355"] {
                 position: fixed;
-                bottom: 10px;
-                right: 30px;
+                bottom: 20px;
+                right: 50px;
             }
         </style>
         """,
@@ -974,8 +999,8 @@ if choose == "Home":
     ABOUT = read_file("readme.md")
     st.title("⚡ WattRank")
     st.markdown(ABOUT)
-    "---"
     float_button(kofi_button())
+    "---"
 
 elif choose == "Energy plots":
     x = "Specific Energy (Wh/kg)"

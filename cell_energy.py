@@ -601,7 +601,8 @@ def run_calc():
         with c1:
             print_results(results)
         with c2:
-            st.plotly_chart(plot_cross_section(calculated_data), use_container_width=True)
+            st.plotly_chart(plot_cross_section(calculated_data),
+                            use_container_width=True)
         st.plotly_chart(plot_mass(calculated_data), use_container_width=True)
 
         return results

@@ -203,7 +203,7 @@ def scatter_plot(data, x, y, title, group_color, group_symbol, size):
         size_max=25,
     )
     # make markers without cycle life (=1) visible
-    fig.update_traces(marker_sizemin=3) 
+    fig.update_traces(marker_sizemin=3)
     fig.update_xaxes(
         showline=True,
         linewidth=2,
@@ -301,7 +301,8 @@ def confidence_ellipse(x, y, n_std=1.6, size=100):
     y_scale = np.sqrt(cov[1, 1]) * n_std
     y_mean = np.mean(y)
 
-    translation_matrix = np.tile([x_mean, y_mean], (ellipse_coords.shape[0], 1))
+    translation_matrix = np.tile([x_mean, y_mean],
+                                 (ellipse_coords.shape[0], 1))
     rotation_matrix = np.array(
         [
             [np.cos(np.pi / 4), np.sin(np.pi / 4)],
@@ -869,37 +870,11 @@ def convert_df(df):
 def add_data_to_df(df, new_data):
     new_data = {col: new_data[col] for col in df.columns if col in new_data}
     st.session_state.data = pd.concat(
-    [df, pd.DataFrame(new_data, index=[len(df)])], ignore_index=True,
+        [df, pd.DataFrame(new_data, index=[len(df)])], ignore_index=True,
     )
     return st.session_state.data
 
 
-# def kofi_button():
-#     button = """
-#         <body>
-#         <style>
-#             .floatingchat-container-wrap {
-#                 position:fixed;
-#                 bottom:16px;
-#                 left:170px;
-#                 z-index:99999999!important;
-#                 width:100%;
-#                 height:65px;
-#                 max-width:180px
-#             }
-#         </style>
-#         <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
-#             <script>
-#             kofiWidgetOverlay.draw('marcinorzech', {
-#                 'type': 'floating-chat',
-#                 'floating-chat.donateButton.text': 'Support me',
-#                 'floating-chat.donateButton.background-color': '#d9534f',
-#                 'floating-chat.donateButton.text-color': '#fff',
-#             });
-#             </script>
-#         </body>
-#     """
-#     return button
 def kofi_button():
     button = """
         <body>
@@ -914,7 +889,8 @@ def kofi_button():
                 max-width:180px;
             }
         </style>
-        <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+        <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'>
+        </script>
             <script>
             kofiWidgetOverlay.draw('marcinorzech', {
                 'type': 'floating-chat',
@@ -926,6 +902,7 @@ def kofi_button():
         </body>
     """
     return button
+
 
 def float_button(button):
     components.html(button, height=650, width=355)
@@ -1104,18 +1081,18 @@ elif choose == "Source data":
     st.markdown(
         """
                 ### Additional references and acknowledgments
-                - Data points 29-74 were aggregated from Enpolite data - 
-                https://enpolite.org/ and *P. Dechent, A. Epp, D. Jöst, 
-                Y. Preger, P. M. Attia, W. Li, and D. U. Sauer, 
-                ENPOLITE: Comparing Lithium-Ion Cells across Energy, Power, 
-                Lifetime, and Temperature, 
-                ACS Energy Letters 2021 6 (6), 2351-2355*   
-                
-                - Data points 75-142 were collected from Matt Lacey's website 
-                (http://lacey.se/) and 
-                *Frith, J.T., Lacey, M.J. & Ulissi, U. 
-                A non-academic perspective on the future of 
-                lithium-based batteries. 
+                - Data points 29-74 were aggregated from Enpolite data -
+                https://enpolite.org/ and *P. Dechent, A. Epp, D. Jöst,
+                Y. Preger, P. M. Attia, W. Li, and D. U. Sauer,
+                ENPOLITE: Comparing Lithium-Ion Cells across Energy, Power,
+                Lifetime, and Temperature,
+                ACS Energy Letters 2021 6 (6), 2351-2355*  
+
+                - Data points 75-142 were collected from Matt Lacey's website
+                (http://lacey.se/) and
+                *Frith, J.T., Lacey, M.J. & Ulissi, U.
+                A non-academic perspective on the future of
+                lithium-based batteries.
                 Nat Commun 14, 420 (2023).*
                 """
     )
@@ -1156,26 +1133,34 @@ elif choose == "About":
             """
             To contact me regarding the Wattrank or anything else email me at:  
             ✉ marcin.w.orzech@gmail.com
-            
-            or message on [LinkedIn](https://www.linkedin.com/in/marcin-orzech/)
+
+            or message on
+            [LinkedIn](https://www.linkedin.com/in/marcin-orzech/)
             """
         )
         with st.form('kofi'):
             st.markdown(
-            """
-            
-            I develop this website in my free time and aim to keep it free to use
-            for all and with full access to the data. If you find Wattrank useful and 
-            want to support its development or just want to show apprieciation, 
-            please consider buying me a cup of coffee. It will keep me motivated 
-            and help with the running costs of this site!
-            
-            [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/E1E3OIB2R)
-            
-            """
-            )
+                """
+                I develop this website in my free time and aim to keep it free
+                to use for all and with full access to the data. If you find
+                Wattrank useful and want to support its development or just
+                want to show apprieciation, please consider buying me a cup
+                of coffee.
+                It will keep me motivated and help with the running costs of
+                this site!
+                """
+                )
+            components.html(
+                """
+                <script type='text/javascript'
+                src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'>
+                </script>
+                <script type='text/javascript'>
+                kofiwidget2.init('Buy Me a Coffee', '#E5625E', 'E1E3OIB2R');
+                kofiwidget2.draw();</script>
+                """, height=60
+                )
             st.form_submit_button("Thank you! ❤", disabled=True)
-
 
     with c1:
         st.markdown(
@@ -1193,14 +1178,16 @@ elif choose == "About":
 
         st.markdown(
             """
-                    ### Licensing and citing
-                    The content of this project itself is licensed under the
-                    [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
-                    and the underlying source code used to format
-                    and display that content is licensed under the
-                    [GPL-3.0 license](https://github.com/sirlod/WattRank_dev/blob/main/LICENSE).
-                    
-                    If you are using Wattrank in your work, please cite  as (or accordingly to your prefered citation style):  
-                    Orzech, M. W.; *WattRank - Compare energy storage devices.*; WattRank.; https://wattrank.com/  (access date: )
-                    """
+            ### Licensing and citing
+            The content of this project itself is licensed under the
+            [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
+            and the underlying source code used to format
+            and display that content is licensed under the
+            [GPL-3.0 license](https://github.com/sirlod/WattRank_dev/blob/main/LICENSE).
+            
+            If you are using Wattrank in your work, please cite  as
+            (or accordingly to your prefered citation style):  
+            Orzech, M. W.; *WattRank - Compare energy storage devices.*
+            WattRank.; https://wattrank.com/  (access date: )
+            """
         )

@@ -1160,19 +1160,22 @@ elif choose == "About":
             or message on [LinkedIn](https://www.linkedin.com/in/marcin-orzech/)
             """
         )
-        st.info(
-        """
-        
-        I develop this website in my free time and aim to keep it free to use
-        for all and with full access to the data. If you find Wattrank useful and 
-        want to support its development or just want to show apprieciation, 
-        please consider buying me a cup of coffee. It will keep me motivated 
-        and help with the running costs of this site!
-        
-        [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/E1E3OIB2R)
-        
-        """
-        )
+        with st.form('kofi'):
+            st.markdown(
+            """
+            
+            I develop this website in my free time and aim to keep it free to use
+            for all and with full access to the data. If you find Wattrank useful and 
+            want to support its development or just want to show apprieciation, 
+            please consider buying me a cup of coffee. It will keep me motivated 
+            and help with the running costs of this site!
+            
+            [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/E1E3OIB2R)
+            
+            """
+            )
+            st.form_submit_button("Thank you! ❤", disabled=True)
+
 
     with c1:
         st.markdown(

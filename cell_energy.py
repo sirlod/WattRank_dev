@@ -556,12 +556,12 @@ def ui():
     st.subheader("About")
     st.markdown(
         """
-        This calculator estimates cell-level energy density for alkali-ion 
+        This calculator estimates cell-level energy density for alkali-ion
         or alkali-metal batteries (e.g. Li-ion, Li metal, Na-ion, Mg-ion)
-        based on specifications of the constituent parts. This calculator 
+        based on specifications of the constituent parts. This calculator
         uses either the 18650 or 21700 form factors as the basis for the
-        calculations. The default values for the positive and negative 
-        electrodes are based on the suggested baseline data for NMC532 
+        calculations. The default values for the positive and negative
+        electrodes are based on the suggested baseline data for NMC532
         vs graphite presented by 
         *Harlow et al, J. Electrochem. Soc. 166 (13) A3031-A3044 (2019)*.  
         """
@@ -569,7 +569,7 @@ def ui():
     st.markdown(
         """
         Author: *Matt Lacey*, adapted to Wattrank by *Marcin Orzech*.  
-        This calculator was originally developed by Matt Lacey 
+        This calculator was originally developed by Matt Lacey
         and published on lacey.se.
         """
     )

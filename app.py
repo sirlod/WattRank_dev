@@ -1093,7 +1093,10 @@ elif choose == "Source data":
                 *Frith, J.T., Lacey, M.J. & Ulissi, U.
                 A non-academic perspective on the future of
                 lithium-based batteries.
-                Nat Commun 14, 420 (2023).*
+                Nat Commun 14, 420 (2023).*  
+
+                - Data points 166-246 were collected from **Gobel Power** website
+                (https://www.gobelpower.com/battery_cell_database_ap14.html)
                 """
     )
 

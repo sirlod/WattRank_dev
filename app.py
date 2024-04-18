@@ -103,7 +103,7 @@ def read_sql(table_name):
 
 def read_csv(path):  # depreciated
     """
-    Read the data and assign to df.
+    Read the data from csv.
 
     Parameters
     ----------
@@ -543,19 +543,16 @@ def filters_preset():
     tags = list_unique_values("Additional tags")
     preset_options = [
         "All data",
-        "Cells in research stage",
         "Commercial cells in standard conditions",
-        "Automotive packs",
         "Cells in development",
+        "Automotive packs",
     ]
     st.markdown("### *Filters preset:*")
     selected_preset = st.radio(
         "Presets:", preset_options, horizontal=True,
         label_visibility="collapsed"
     )
-    if selected_preset == "Cells in research stage":
-        preset_filters = {"Maturity": "Research"}
-    elif selected_preset == "Commercial cells in standard conditions":
+    if selected_preset == "Commercial cells in standard conditions":
         preset_filters = {
             "Maturity": "Commercial",
             "Form factor": [
@@ -875,50 +872,50 @@ def add_data_to_df(df, new_data):
     return st.session_state.data
 
 
-def kofi_button():
-    button = """
-        <body>
-        <style>
-            .floatingchat-container-wrap {
-                position:fixed;
-                bottom:16px;
-                left:170px;
-                z-index:99999999!important;
-                width:100%;
-                height:65px;
-                max-width:180px;
-            }
-        </style>
-        <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'>
-        </script>
-            <script>
-            kofiWidgetOverlay.draw('marcinorzech', {
-                'type': 'floating-chat',
-                'floating-chat.donateButton.text': 'Support me',
-                'floating-chat.donateButton.background-color': '#d9534f',
-                'floating-chat.donateButton.text-color': '#fff',
-            });
-            </script>
-        </body>
-    """
-    return button
+# def kofi_button():
+#     button = """
+#         <body>
+#         <style>
+#             .floatingchat-container-wrap {
+#                 position:fixed;
+#                 bottom:16px;
+#                 left:170px;
+#                 z-index:99999999!important;
+#                 width:100%;
+#                 height:65px;
+#                 max-width:180px;
+#             }
+#         </style>
+#         <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'>
+#         </script>
+#             <script>
+#             kofiWidgetOverlay.draw('marcinorzech', {
+#                 'type': 'floating-chat',
+#                 'floating-chat.donateButton.text': 'Support me',
+#                 'floating-chat.donateButton.background-color': '#d9534f',
+#                 'floating-chat.donateButton.text-color': '#fff',
+#             });
+#             </script>
+#         </body>
+#     """
+#     return button
 
 
-def float_button(button):
-    components.html(button, height=650, width=355)
+# def float_button(button):
+#     components.html(button, height=650, width=355)
 
-    st.markdown(
-        """
-        <style>
-            iframe[width="355"] {
-                position: fixed;
-                bottom: 20px;
-                right: 50px;
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+#     st.markdown(
+#         """
+#         <style>
+#             iframe[width="355"] {
+#                 position: fixed;
+#                 bottom: 20px;
+#                 right: 50px;
+#             }
+#         </style>
+#         """,
+#         unsafe_allow_html=True,
+#     )
 
 
 page_config()
@@ -938,24 +935,24 @@ with st.sidebar:
     choose = option_menu(
         "WattRank",
         [
-            "Home",
+            # "Home",
             "Energy plots",
             # 'Ragone plot',
             "Custom plot",
             "Add data",
             "Source data",
             "Cell energy calculator",
-            "About",
+            # "About",
         ],
         icons=[
-            "house",
+            # "house",
             "battery-full",
             # 'hourglass-split',
             "graph-up",
             "upload",
             "stack",
             "calculator",
-            "person lines fill",
+            # "person lines fill",
         ],
         menu_icon="lightning-charge",
         default_index=0,
@@ -972,14 +969,18 @@ with st.sidebar:
         },
     )
 
-if choose == "Home":
-    ABOUT = read_file("readme.md")
-    st.title("⚡ WattRank")
-    st.markdown(ABOUT)
-    float_button(kofi_button())
-    "---"
+# if choose == "Home":
+#     ABOUT = read_file("readme.md")
+#     st.title("⚡ WattRank")
+#     st.markdown(ABOUT)
+#     float_button(kofi_button())
+#     "---"
 
-elif choose == "Energy plots":
+if choose == "Energy plots":
+    st.title("⚡ WattRank")
+    "---"
+    st.header("Energy and Power plots")
+
     x = "Specific Energy (Wh/kg)"
     y = "Energy density (Wh/L)"
     y2 = "Specific Power (W/kg)"
@@ -1005,6 +1006,10 @@ elif choose == "Energy plots":
 #     st.write('Work in progress...')
 
 elif choose == "Custom plot":
+    st.title("⚡ WattRank")
+    "---"
+    st.header("Custom plots")
+
     axes_options = df.columns.drop(["Additional tags", "Reference/source"])
     c1, c2 = st.columns(2)
     with c1:
@@ -1033,7 +1038,10 @@ elif choose == "Custom plot":
                         theme=None, config=config)
 
 elif choose == "Add data":
-    st.write("## Upload your own data:")
+    st.title("⚡ WattRank")
+    "---"
+    st.write("## Upload your own data to database:")
+
     new_data = input_form()
     df_updated = pd.concat(
         [df, pd.DataFrame(new_data, index=[len(df)])], ignore_index=True
@@ -1063,6 +1071,8 @@ elif choose == "Add data":
     upload_button(new_data, address)
 
 elif choose == "Source data":
+    st.title("⚡ WattRank")
+    "---"
     st.title("WattRank data:")
     st.dataframe(df.style.format(thousands="", precision=1))
     st.download_button(
@@ -1125,72 +1135,72 @@ elif choose == "Cell energy calculator":
     if st.button("Clean all calculation results"):
         st.session_state.df_state = 0
 
-elif choose == "About":
-    st.title("Hi!")
-    c1, c2 = st.columns([2, 1], gap="large")
-    with c2:
-        st.image(
-            "https://avatars.githubusercontent.com/u/103963175?s=400&u=817001116755a3c8370851e82ed54022a575e0b8&v=4"
-        )
-        st.markdown(
-            """
-            To contact me regarding the Wattrank or anything else email me at:  
-            ✉ marcin.w.orzech@gmail.com
+# elif choose == "About":
+#     st.title("Hi!")
+#     c1, c2 = st.columns([2, 1], gap="large")
+#     with c2:
+#         st.image(
+#             "https://avatars.githubusercontent.com/u/103963175?s=400&u=817001116755a3c8370851e82ed54022a575e0b8&v=4"
+#         )
+#         st.markdown(
+#             """
+#             To contact me regarding the Wattrank or anything else email me at:  
+#             ✉ marcin.w.orzech@gmail.com
 
-            or message on
-            [LinkedIn](https://www.linkedin.com/in/marcin-orzech/)
-            """
-        )
-        with st.form('kofi'):
-            st.markdown(
-                """
-                I develop this website in my free time and aim to keep it free
-                to use for all and with full access to the data. If you find
-                Wattrank useful and want to support its development or just
-                want to show apprieciation, please consider buying me a cup
-                of coffee.
-                It will keep me motivated and help with the running costs of
-                this site!
-                """
-                )
-            components.html(
-                """
-                <script type='text/javascript'
-                src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'>
-                </script>
-                <script type='text/javascript'>
-                kofiwidget2.init('Buy Me a Coffee', '#E5625E', 'E1E3OIB2R');
-                kofiwidget2.draw();</script>
-                """, height=60
-                )
-            st.form_submit_button("Thank you! ❤", disabled=True)
+#             or message on
+#             [LinkedIn](https://www.linkedin.com/in/marcin-orzech/)
+#             """
+#         )
+#         with st.form('kofi'):
+#             st.markdown(
+#                 """
+#                 I develop this website in my free time and aim to keep it free
+#                 to use for all and with full access to the data. If you find
+#                 Wattrank useful and want to support its development or just
+#                 want to show apprieciation, please consider buying me a cup
+#                 of coffee.
+#                 It will keep me motivated and help with the running costs of
+#                 this site!
+#                 """
+#                 )
+#             components.html(
+#                 """
+#                 <script type='text/javascript'
+#                 src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'>
+#                 </script>
+#                 <script type='text/javascript'>
+#                 kofiwidget2.init('Buy Me a Coffee', '#E5625E', 'E1E3OIB2R');
+#                 kofiwidget2.draw();</script>
+#                 """, height=60
+#                 )
+#             st.form_submit_button("Thank you! ❤", disabled=True)
 
-    with c1:
-        st.markdown(
-            """
-                I'm Marcin, originally from northern Poland but now residing in Norrköping, Sweden. I work as an R&D manager at Redox.me, a small company that specializes in creating electrochemical cells for research and materials development. I’m overseeing a range of projects, but my main focus is on designing battery test cells for various in situ measurements.  
+#     with c1:
+#         st.markdown(
+#             """
+#                 I'm Marcin, originally from northern Poland but now residing in Norrköping, Sweden. I work as an R&D manager at Redox.me, a small company that specializes in creating electrochemical cells for research and materials development. I’m overseeing a range of projects, but my main focus is on designing battery test cells for various in situ measurements.  
                 
-                I completed an Engineering Doctorate (EngD) at Swansea University, where I spent 4 years researching Na-ion batteries for stationary energy storage systems (ESS). I hold two bachelor's degrees - in Materials Engineering and Mechatronics, as well as a Master's degree in Materials Engineering. My passion for batteries started during my Master's program, where for the thesis I tried my chances at making Li-ion cells with SiOx anodes mixed with graphene made in a kitchen blender.  
+#                 I completed an Engineering Doctorate (EngD) at Swansea University, where I spent 4 years researching Na-ion batteries for stationary energy storage systems (ESS). I hold two bachelor's degrees - in Materials Engineering and Mechatronics, as well as a Master's degree in Materials Engineering. My passion for batteries started during my Master's program, where for the thesis I tried my chances at making Li-ion cells with SiOx anodes mixed with graphene made in a kitchen blender.  
                 
-                Wattrank came to be as a fun project for me to dive into Python and SQL. I wanted to turn my learning experience into something helpful for others, and so Wattrank was born! I'm always open to feedback and suggestions on how to improve the site. I'm constantly working to improve the technical side of the website and add more data to the plots.  
+#                 Wattrank came to be as a fun project for me to dive into Python and SQL. I wanted to turn my learning experience into something helpful for others, and so Wattrank was born! I'm always open to feedback and suggestions on how to improve the site. I'm constantly working to improve the technical side of the website and add more data to the plots.  
                 
-                My free time I devote to my family or risk minor injuries while rock climbing. To unwind, I love playing board games with friends, sometimes with a glass of homemade beer. 
+#                 My free time I devote to my family or risk minor injuries while rock climbing. To unwind, I love playing board games with friends, sometimes with a glass of homemade beer. 
 
-                """
-        )
+#                 """
+#         )
 
-        st.markdown(
-            """
-            ### Licensing and citing
-            The content of this project itself is licensed under the
-            [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
-            and the underlying source code used to format
-            and display that content is licensed under the
-            [GPL-3.0 license](https://github.com/sirlod/WattRank_dev/blob/main/LICENSE).
+#         st.markdown(
+#             """
+#             ### Licensing and citing
+#             The content of this project itself is licensed under the
+#             [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
+#             and the underlying source code used to format
+#             and display that content is licensed under the
+#             [GPL-3.0 license](https://github.com/sirlod/WattRank_dev/blob/main/LICENSE).
             
-            If you are using Wattrank in your work, please cite  as
-            (or accordingly to your prefered citation style):  
-            Orzech, M. W.; *WattRank - Compare energy storage devices.*
-            WattRank.; https://wattrank.com/  (access date: )
-            """
-        )
+#             If you are using Wattrank in your work, please cite  as
+#             (or accordingly to your prefered citation style):  
+#             Orzech, M. W.; *WattRank - Compare energy storage devices.*
+#             WattRank.; https://wattrank.com/  (access date: )
+#             """
+#         )

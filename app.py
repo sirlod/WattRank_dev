@@ -932,8 +932,9 @@ df = replace_nan(df)
 
 # Multipage menu
 with st.sidebar:
+    st.image("logo-wattrank.png")
     choose = option_menu(
-        "WattRank",
+        "",
         [
             # "Home",
             "Energy plots",
@@ -977,8 +978,8 @@ with st.sidebar:
 #     "---"
 
 if choose == "Energy plots":
-    st.title("⚡ WattRank")
-    "---"
+    # st.title("⚡ WattRank")
+    # "---"
     st.header("Energy and Power plots")
 
     x = "Specific Energy (Wh/kg)"
@@ -1006,8 +1007,8 @@ if choose == "Energy plots":
 #     st.write('Work in progress...')
 
 elif choose == "Custom plot":
-    st.title("⚡ WattRank")
-    "---"
+    # st.title("⚡ WattRank")
+    # "---"
     st.header("Custom plots")
 
     axes_options = df.columns.drop(["Additional tags", "Reference/source"])
@@ -1038,8 +1039,8 @@ elif choose == "Custom plot":
                         theme=None, config=config)
 
 elif choose == "Add data":
-    st.title("⚡ WattRank")
-    "---"
+    # st.title("⚡ WattRank")
+    # "---"
     st.write("## Upload your own data to database:")
 
     new_data = input_form()
@@ -1071,8 +1072,8 @@ elif choose == "Add data":
     upload_button(new_data, address)
 
 elif choose == "Source data":
-    st.title("⚡ WattRank")
-    "---"
+    # st.title("⚡ WattRank")
+    # "---"
     st.title("WattRank data:")
     st.dataframe(df.style.format(thousands="", precision=1))
     st.download_button(

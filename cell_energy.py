@@ -102,6 +102,7 @@ def cell_param(celltype):
 
 
 def cyl_calculate(
+    cell_id="",
     p_specific_cap=200,
     p_areal_cap=4,
     p_massfrac=0.92,
@@ -133,6 +134,9 @@ def cyl_calculate(
     cell_headspace=0.5,
     cell_extra_mass=3,
 ):
+    # #assing default cell name
+    # cell_id = "Calculated cell nr " + str(st.session_state.df_state + 1)
+
     # Definition of quantities into dictionaries
     p = {
         "specific_cap": p_specific_cap,
@@ -280,6 +284,7 @@ def cyl_calculate(
     }
 
     out = {
+        "name":cell_id,
         "p": p,
         "n": n,
         "s": s,
@@ -383,6 +388,13 @@ def input_fields():
     col2, col3, col4, col5 = st.columns(4)
 
     input_dict = {}
+
+    input_dict["cell_id"] = st.text_input(
+    "Cell ID", placeholder="Type in unique cell name",
+    key="name" + str(st.session_state.calc))
+
+    if not input_dict["cell_id"]:
+        input_dict["cell_id"] = "Calculated cell nr " + str(st.session_state.df_state + 1)
 
     with col2:
         st.markdown("### +ve")
@@ -501,7 +513,7 @@ def formatted_results(calculated_data, celltype):
                                       / calculated_data['cell']['mass']*1000),
         "Volumetric capacity (Ah/L)": (calculated_data['cell']['energy_vol']
                                        / voltage),
-        "Name": "Calculated cell nr " + str(st.session_state.df_state + 1),
+        "Name":  calculated_data['name'],
         "Form factor": "Cylindrical " + celltype,
         "Capacity calculation method": "Cell",
         "Technology": "Battery",

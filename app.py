@@ -54,7 +54,7 @@ def page_config():
     Must be called as first streamlit command."""
     st.set_page_config(
         page_title="WattRank",
-        page_icon="⚡",
+        page_icon="assets/favicon.ico",
         layout="wide",
         menu_items={
             "Get Help": None,
@@ -932,7 +932,8 @@ df = replace_nan(df)
 
 # Multipage menu
 with st.sidebar:
-    st.image("logo-wattrank.png")
+    st.image("assets/logo-wattrank-full.png")
+    # st.image("logo-wattrank.png")
     choose = option_menu(
         "",
         [

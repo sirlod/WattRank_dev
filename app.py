@@ -196,6 +196,7 @@ def scatter_plot(data, x, y, title, group_color, group_symbol, size):
         color=group_color,
         symbol=group_symbol,
         height=600,
+        width=900,
         title=title,
         hover_name="Name",
         hover_data=HOVER_DATA_DICT,
@@ -224,17 +225,20 @@ def scatter_plot(data, x, y, title, group_color, group_symbol, size):
     fig.update_layout(
         plot_bgcolor="rgba(255,255,255,0)",
         template="simple_white",
+        autosize=True,
         modebar_add=["drawcircle", "drawclosedpath", "eraseshape"],
         modebar_remove=["lasso2d", "select2d", "resetScale2d", "pan"],
         modebar_orientation="h",
         legend_orientation="v",
-        legend_y=1,
-        legend_borderwidth=2,
-        title_font_size=30,
+        legend_y=1.005,
+        legend_x=1,
+        legend_borderwidth=1,
+        title_font_size=20,
         title_x=0.5,
         title_xref="paper",
         title_xanchor="center",
         title_yanchor="top",
+        clickmode="event+select"
     )
 
     return fig
@@ -999,9 +1003,9 @@ if choose == "Energy plots":
     fig_power = highlight_clusters(fig_power, df, group_color, x, y2)
     fig_power = connect_legend_with_clusters(fig_power)
 
-    st.plotly_chart(fig_energy, use_container_width=True,
+    st.plotly_chart(fig_energy, use_container_width=False,
                     theme=None, config=config)
-    st.plotly_chart(fig_power, use_container_width=True,
+    st.plotly_chart(fig_power, use_container_width=False,
                     theme=None, config=config)
 
 # elif choose == 'Ragone plot':
@@ -1036,7 +1040,7 @@ elif choose == "Custom plot":
         fig_custom = connect_legend_with_clusters(fig_custom)
         fig_custom.update_xaxes(rangemode="nonnegative")
 
-        st.plotly_chart(fig_custom, use_container_width=True,
+        st.plotly_chart(fig_custom, use_container_width=False,
                         theme=None, config=config)
 
 elif choose == "Add data":

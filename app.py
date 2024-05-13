@@ -238,6 +238,7 @@ def scatter_plot(data, x, y, title, group_color, group_symbol, size):
         title_xref="paper",
         title_xanchor="center",
         title_yanchor="top",
+        clickmode="event+select"
     )
 
     return fig

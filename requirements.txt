@@ -1,5 +1,5 @@
 pandas
-streamlit == 1.33.0
+streamlit
 # streamlit == 1.27.0
 streamlit_option_menu
 plotly

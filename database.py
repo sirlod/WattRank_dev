@@ -9,6 +9,13 @@ import os
 import psycopg2
 import pandas as pd
 
+# Fetch env variables
+USER = os.environ.get("user")
+PASSWORD = os.environ.get("password")
+HOST = os.environ.get("host")
+PORT = os.environ.get("port")
+DBNAME = os.environ.get("dbname")
+
 columns_in_order = """
                     name,
                     specific_energy,
@@ -44,9 +51,18 @@ PARAMETERS_TABLE = "SELECT * FROM parameters;"
 INSERT_EMAIL = "INSERT INTO emails (cell_id, email) VALUES ((SELECT MAX(id) from data), %s)"
 RESET_SEQUENCE = "SELECT setval('data_id_seq', (SELECT MAX(id) from data));"
 
+def get_connection():
+    return psycopg2.connect(
+        user=USER,
+        password=PASSWORD,
+        host=HOST,
+        port=PORT,
+        dbname=DBNAME,
+        sslmode='require'
+    )
 
 def get_table(table):
-    connection = psycopg2.connect(os.environ["DATABASE_URL"])
+    connection = get_connection()
     try:
         if table == 'data':
             return pd.read_sql(DATA_TABLE, connection, index_col='id')
@@ -59,7 +75,7 @@ def get_table(table):
 def upload_row(values):
     vals_str = ','.join(['%s' for i in range(len(values))])
     UPLOAD_DATA = f"INSERT INTO data ({columns_in_order}) VALUES ({vals_str});"
-    connection = psycopg2.connect(os.environ["DATABASE_URL"])
+    connection = get_connection()
     try:
         with connection:
             with connection.cursor() as cursor:
@@ -70,7 +86,7 @@ def upload_row(values):
 
 
 def save_email(address):
-    connection = psycopg2.connect(os.environ["DATABASE_URL"])
+    connection = get_connection()
     try:
         with connection:
             with connection.cursor() as cursor:

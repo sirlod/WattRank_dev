@@ -14,7 +14,6 @@ import plotly.express as px
 import numpy as np
 import database
 import cell_energy
-import webbrowser
 
 
 config = {"displaylogo": False}
@@ -938,6 +937,9 @@ df = replace_nan(df)
 # Multipage menu
 with st.sidebar:
     st.image("assets/logo-wattrank-full.png")
+    st.link_button("🔗 **Usable Watts**",
+                   "https://usablewatts.com",
+                   use_container_width=True)
     # st.image("logo-wattrank.png")
     choose = option_menu(
         "",
@@ -949,7 +951,7 @@ with st.sidebar:
             "Add data",
             "Source data",
             "Cell energy calculator",
-            "Usable Watts",
+            # "About",
         ],
         icons=[
             # "house",
@@ -959,7 +961,7 @@ with st.sidebar:
             "upload",
             "stack",
             "calculator",
-            "link",
+            # "person lines fill",
         ],
         menu_icon="lightning-charge",
         default_index=0,
@@ -1142,8 +1144,8 @@ elif choose == "Cell energy calculator":
     if st.button("Clean all calculation results"):
         st.session_state.df_state = 0
 
-elif choose == "Usable Watts":
-    webbrowser.open("https://usablewatts.com", new=0)
+# elif choose == "About":
+#     st.title("Hi!")
 #     c1, c2 = st.columns([2, 1], gap="large")
 #     with c2:
 #         st.image(

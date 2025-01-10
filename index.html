@@ -35,7 +35,7 @@
         gtag('config', 'G-JWN8F7Y9ZR');
       </script>
 
-      <style>
+      {{/*  <style>
           .wrapper {
             position: relative;
             z-index: 1;
@@ -54,7 +54,9 @@
             display: block;
             color: rgb(0, 0, 0);
           }
+        </style>  */}}
 
+        <style type="text/css">
           html {
             overflow: auto;
           }
@@ -81,12 +83,16 @@
         <div class="no-js-message">
           <p>Please enable JavaScript to use the app.</p>
         </div>
-        <div class="wrapper">
-          <div class="hidefooter"></div>
+
           <iframe src="https://wattrank.streamlit.app/~/+/"
-              scrolling="auto">Your browser doesn't support iframes
+            frameborder="0"
+            marginheight="0"
+            marginwidth="0"
+            width="100%"
+            height="100%"
+            scrolling="auto">Your browser doesn't support iframes
         </iframe>
-        </div>
+
     <script>
         document.documentElement.className = 'js';
         if (!document.documentElement.classList.contains('js')) {

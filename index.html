@@ -2,7 +2,6 @@
     <html>
     <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>WattRank - Compare energy storage devices</title>
       <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
 
@@ -35,7 +34,7 @@
         gtag('config', 'G-JWN8F7Y9ZR');
       </script>
 
-      {{/*  <style>
+      <style>
           .wrapper {
             position: relative;
             z-index: 1;
@@ -54,7 +53,7 @@
             display: block;
             color: rgb(0, 0, 0);
           }
-        </style>  */}}
+        </style>
 
         <style type="text/css">
           html {
@@ -86,16 +85,12 @@
         <div class="no-js-message">
           <p>Please enable JavaScript to use the app.</p>
         </div>
-
-          <iframe src="https://wattrank.streamlit.app/~/+/"
-            frameborder="0"
-            marginheight="0"
-            marginwidth="0"
-            width="100%"
-            height="100%"
+        <div class="wrapper">
+          <div class="hidefooter"></div>
+          <iframe src="https://wattrank.streamlit.app?embed=true"
             scrolling="auto">Your browser doesn't support iframes
         </iframe>
-
+        </div>
     <script>
         document.documentElement.className = 'js';
         if (!document.documentElement.classList.contains('js')) {

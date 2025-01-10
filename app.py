@@ -876,50 +876,64 @@ def add_data_to_df(df, new_data):
     return st.session_state.data
 
 
-# def kofi_button():
-#     button = """
-#         <body>
-#         <style>
-#             .floatingchat-container-wrap {
-#                 position:fixed;
-#                 bottom:16px;
-#                 left:170px;
-#                 z-index:99999999!important;
-#                 width:100%;
-#                 height:65px;
-#                 max-width:180px;
-#             }
-#         </style>
-#         <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'>
-#         </script>
-#             <script>
-#             kofiWidgetOverlay.draw('marcinorzech', {
-#                 'type': 'floating-chat',
-#                 'floating-chat.donateButton.text': 'Support me',
-#                 'floating-chat.donateButton.background-color': '#d9534f',
-#                 'floating-chat.donateButton.text-color': '#fff',
-#             });
-#             </script>
-#         </body>
-#     """
-#     return button
+def kofi_float_button():
+    button = """
+        <body>
+        <style>
+            .floatingchat-container-wrap {
+                position:fixed;
+                bottom:16px;
+                left:170px;
+                z-index:99999999!important;
+                width:100%;
+                height:65px;
+                max-width:180px;
+            }
+        </style>
+        <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'>
+        </script>
+            <script>
+            kofiWidgetOverlay.draw('marcinorzech', {
+                'type': 'floating-chat',
+                'floating-chat.donateButton.text': 'Support me',
+                'floating-chat.donateButton.background-color': '#d9534f',
+                'floating-chat.donateButton.text-color': '#fff',
+            });
+            </script>
+        </body>
+    """
+    return button
 
 
-# def float_button(button):
-#     components.html(button, height=650, width=355)
+def float_button(button):
+    components.html(button, height=650, width=355)
 
-#     st.markdown(
-#         """
-#         <style>
-#             iframe[width="355"] {
-#                 position: fixed;
-#                 bottom: 20px;
-#                 right: 50px;
-#             }
-#         </style>
-#         """,
-#         unsafe_allow_html=True,
-#     )
+    st.markdown(
+        """
+        <style>
+            iframe[width="355"] {
+                position: fixed;
+                bottom: 20px;
+                right: 50px;
+                z-index:999999;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def kofi_button(): 
+    components.html(
+                """
+                <script type='text/javascript'
+                src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'>
+                </script>
+                <script type='text/javascript'>
+                kofiwidget2.init('Buy Me a Coffee', '#E5625E', 'E1E3OIB2R');
+                kofiwidget2.draw();</script>
+                """, height=60
+                )
 
 
 page_config()
@@ -977,6 +991,7 @@ with st.sidebar:
             "nav-link-selected": {"background-color": "#333399"},
         },
     )
+    kofi_button()
 
 # if choose == "Home":
 #     ABOUT = read_file("readme.md")
